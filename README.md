@@ -3,18 +3,25 @@ Compiling the existing code and data into a package for better collaboration.
 
 ## From the vignette:
 
-`disnet` has been designed to simulate influenza over a network created
-by combining satellite imagery, population data, and road network information. 
+`disnet` has been designed to simulate influenza (for now) over a network created
+by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.  
+
+## Compartmental disease model
+Discrete time, stochastic, metatpopulation model. 
+
+In case of influenza, the compartmental model is SEIR:
+
+S - Susceptible
+E - Latent
+I - Infectious
+R - Recovered
 
 ## Main functions
-
 1. `disnet_commuting` - Comuting function. Takes in network object (in `graphml` format, and calculates the commuting rates for all outgoing edges in network
    
 2. `disnet_sim_setup` - Simulation setup function. Takes in the graph file with commuting rates added to it, and preps it up for runnning simulations. 
-   *NOTE*: This function will create a folder in `supplement/data/intermed` to save the resulting data. You can specify a different folder. 
 
-3. `disnet_simulate` - Simulation function. This function runs the simulations
-   *NOTE*: This function will create a folder in `supplement/data/simulation-results` (unless you specify a different folder) in your working directory, so it can save the simulation results. 
+3. `disnet_simulate` - Simulation function. This function runs the disease model simulations over the network. 
 
 
 ```r
@@ -37,9 +44,8 @@ for_sim = disnet_sim_setup(g_comm, seed_nd = seed_nd, output_dir = NA)
 simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA)
 ```
 
-
 ## Sample datasets
-- `g.RDS`: The raw graphml/network object which we calculate commuting rates. 
+- `g.RDS`: The raw graphml/network object
 
 To access the sample dataset:
 
