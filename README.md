@@ -1,8 +1,6 @@
 # disnet
 Compiling the existing code and data into a package for better collaboration.
 
-## From the vignette:
-
 `disnet` has been designed to simulate influenza (for now) over a network created
 by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.  
 
