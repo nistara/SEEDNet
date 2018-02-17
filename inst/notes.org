@@ -1,0 +1,27 @@
+
+* Thursday, February 15, 2018
+** notes
+- use files names as inputs to the function
+- getOption("dir", "dir2") for directory to save results in 
+- for data (both in example as well as function definition), consider using: =system.file...=
+- sim_output for output directory (to make it explicit)
+- consider removing =fxn= from the function names....be less redundant. perhaps use =flunet_sim=
+- consider arabic instead of Roman numbers in the function names
+- use =message= instead of =cat=....it's explicitly a message, and they can be collected as well as silenced
+- don't save files by default - give user the option to return as output, or save file if directory is specified (i.e. it's not empty, =""= or an =NA=). 
+  So for e.g.
+#+BEGIN_SRC R
+if (length(sim_out) >0 && !is.na(sim_out) {
+f = file.path("sample_data", ...., %d%s) sprintf()
+saveRDS(..., f[1])
+saveRDS)..., f[2])
+f
+} else {
+list(sim = sim, info = info)
+}
+#+END_SRC
+** next steps
+- make small data samples and add to =inst/sample_data=
+- provide Duncan with link to actual big data
+- make ebo-net or rather, disnet!
+

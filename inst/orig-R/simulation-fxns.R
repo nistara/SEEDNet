@@ -1,0 +1,429 @@
+# ==============================================================================
+# Effective population
+# ==============================================================================
+
+# Based on the formula written for simplified model (on green page)
+# -----------------------------------------------------------------
+effective_pop_II = function(i, j, g, tau = 3) {
+    ## Populations of neighboring incoming nodes 'i'
+    N_i = vertex_attr(g, "pop", i)
+
+    ## Commuting proportion of 'i'
+    sigma_i = vertex_attr(g, "sigma", i)
+
+    ## Commuting proportion from 'i' to 'j'
+    sigma_ij = edge_attr(g, "commuting_prop", paste0(i, "|", j))
+
+    ## Second component of formula:
+    N_ij = N_i * ((sigma_ij/tau) / (1 + (sigma_i/tau)))
+    # N_ij = as.data.frame(N_ij)
+    return(N_ij)
+}
+
+    
+
+effective_pop_I = function(j, g, tau = 3) {
+    print(paste0("Effective population for ", j))
+
+    ## Populations of node 'j'
+    N_j = vertex_attr(g, "pop", j)
+
+    ## Commuting proportion of 'j'
+    sigma_j = vertex_attr(g, "sigma", j)
+
+    ## Solve first component of Nj* formula
+    N_jj = N_j / (1 + (sigma_j/tau))
+
+    ## Identify neighboring incoming nodes, 'i'
+    i = names(neighbors(g, j, "in"))
+
+    ## Calulate the individual second components of formula,
+    ## which are then summed up
+    N_ij = sapply(i, effective_pop_II, j, g)
+    sum_N_ij = sum(N_ij)
+
+    ## N_eff_j = Nj*, the effective population
+    N_eff_j = N_jj + sum_N_ij
+    return(N_eff_j)
+}
+
+ 
+effective_pop_fxn = function(g) {
+    j = vertex_attr(g, "name")
+    eff_pop = lapply(j, effective_pop_I, g)
+    eff_pop = do.call(rbind, eff_pop)
+    eff_pop = round(eff_pop)
+    ## Include the eff pop as a vertex attribute in graph
+    g = set_vertex_attr(g, "eff_pop", value = eff_pop)
+    return(g)
+}
+
+
+
+# *****************************************************************************
+effpop_takeII_sub = function(df, tau) {
+    N_ij = df$pop_from * ((df$commuting_prop/tau) / (1 + (df$sigma_from/tau)))
+    N_ij = sum(N_ij)
+}
+
+
+    
+effpop_takeII = function(g, tau = 3) {
+    verts = igraph::as_data_frame(g, "vertices")
+    edges = igraph::as_data_frame(g, "edges")
+    # first component of effective pop (N_jj)
+    verts$N_jj = verts$pop/(1 + (verts$sigma/tau))
+    # second component of effective pop (sum N_ij)
+    edges$sigma_from = inner_join(edges, verts[ , c("name", "sigma")],
+                       by = c("from" = "name"))[["sigma"]]
+    # split edges by receipient 
+    to_edges = split(edges, as.numeric(edges$to))
+    sum_N_ij = sapply(to_edges, effpop_takeII_sub, tau)
+    # checks before merging
+    # table(rownames(verts) == verts$name)
+    # table(rownames(verts) == names(sum_N_ij))
+    verts$sum_N_ij = sum_N_ij
+    verts$eff_pop = verts$N_jj + verts$sum_N_ij
+    # adding eff pop back to graph
+    g = set_vertex_attr(g, "eff_pop", value = verts$eff_pop)
+    return(g)
+}
+
+
+# ==============================================================================
+# Add sigma and sigmaProp_by_tau
+# ==============================================================================
+
+add_sigmas_fxn = function(g, tau){
+    ## calculate sigma_by_tau and sigmaProp_by_tau
+    sigma_by_tau = vertex_attr(g, "sigma")/tau
+    sigmaProp_by_tau = edge_attr(g, "commuting_prop")/tau
+
+    ## add the two as vertex and edge attribute respectively
+    g = set_vertex_attr(g, "sigma_by_tau", value = sigma_by_tau)
+    g = set_edge_attr(g, "sigmaProp_by_tau", value = sigmaProp_by_tau)
+    return(g)
+}
+
+
+# ==============================================================================
+# Initializing start_TS dataframe
+# ==============================================================================
+
+start_TS_fxn = function(g){
+    verts = igraph::as_data_frame(g, "vertices")
+    S = round(vertex_attr(g, "pop"))
+    start_TS = data.frame(name = verts$name,
+                 S = S,
+                 E = 0,
+                 I = 0,
+                 Ia = 0,
+                 R = 0,
+                 stringsAsFactors = FALSE)
+    return(start_TS)
+}
+
+
+# ==============================================================================
+# Seed node function
+# ==============================================================================
+
+seed_nd_fxn = function(df, nd, inf){
+    seed_row = which(df$name %in% nd)
+    df[seed_row, c("S", "I")] = c(df$S[seed_row] -  inf, inf)
+    return(df)
+}
+
+    
+
+# ==============================================================================
+# FOI Take II!
+# ==============================================================================
+
+
+get_vertInfo_fxn = function(g, beta){
+    df = igraph::as_data_frame(g, "vertices")
+    df = df[  , c("name", "eff_pop", "sigma_by_tau")]
+    df$b_by_n = beta/df$eff_pop
+    df$sigma_by_tau_p1 = df$sigma_by_tau + 1
+    return(df)
+}
+
+
+
+## net_neighbors_fxn
+## -----------------------------------------------------------------------------
+## Gets neighbor info specific to whether the edge is incoming or outgoing
+##      i.e.  2 neighbor modes: "in" or "out"
+## 
+## I. For incoming edges, it provides:
+##    -------------------------------
+##      1. name of neighbors commuting to node
+##      2. sigma_by_tau_p1: sigma_by_tau + 1
+##      3. sigmaProp_by_tau: proportion of neighbor pop commuting to node
+##
+## II. For outgoing edges, it provides:
+##     -------------------------------
+##      1. name of neighbors to which node is commuting to
+##      2. sigmaProp_by_tau: proportion of node pop commuting to neighbor
+##
+
+net_neighbors_fxn = function(vert, g, m, vert_info){
+    neigh_name = names(neighbors(graph = g, v = vert, mode = m))
+    if(length(neigh_name) != 0){
+        if(m == "in"){
+            from = neigh_name
+            to = vert
+            sigma_by_tau_p1 = vert_info$sigma_by_tau_p1[
+                vert_info$name %in% neigh_name ]
+            sigmaProp_by_tau = edge_attr(g, "sigmaProp_by_tau",
+                                         paste0(from, "|", to))
+            df = data.frame(name = neigh_name,
+                            sigma_by_tau_p1 = sigma_by_tau_p1,
+                            sigmaProp_by_tau = sigmaProp_by_tau,
+                            stringsAsFactors = FALSE)
+        } else {
+            from = vert
+            to = neigh_name
+            sigmaProp_by_tau = edge_attr(g, "sigmaProp_by_tau",
+                                         paste0(from, "|", to))
+            df = data.frame(name = neigh_name,
+                            sigmaProp_by_tau = sigmaProp_by_tau,
+                            stringsAsFactors = FALSE)
+        }   
+    } else {
+        df = data.frame(NULL)
+    }
+    return(df)
+}
+
+
+
+## j_in function (wraps up the net_neighbors_fxn for incoming edges)
+## -----------------------------------------------------------------------------
+j_in_fxn = function(vert_info, g){
+    j = vert_info$name
+    j_in = lapply(setNames(j, j), net_neighbors_fxn, g, m = "in", vert_info)
+    return(j_in)
+}
+
+
+
+## j_out function (wraps up the net_neighbors_fxn for outgoing edges)
+## -----------------------------------------------------------------------------
+j_out_fxn = function(vert_info, g){
+    j = vert_info$name
+    j_out = lapply(setNames(j, j), net_neighbors_fxn, g, m = "out", vert_info)
+    return(j_out)
+}
+
+
+
+## component 2 sub (minus I)
+## -----------------------------------------------------------------------------
+comp2_sub_fxn = function(j_in){
+    if(length(j_in) != 0){
+        name = j_in$name
+        comp2_sub = j_in$sigmaProp_by_tau/j_in$sigma_by_tau_p1
+        df = data.frame(name = name,
+                        comp2_sub = comp2_sub,
+                        stringsAsFactors = FALSE)
+    } else {
+        df = data.frame(NULL)
+    }
+    
+    return(df)
+}
+
+
+## component 2 with i
+## -----------------------------------------------------------------------------
+
+
+comp2_i_fxn = function(comp, vI, vIa)#, vname)
+{
+    df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
+    sum(df, na.rm = TRUE)
+}
+
+
+## calculate l_ji part
+## -----------------------------------------------------------------------------
+
+l_ji_fxn = function(j_out, l_in_node){
+    local_foi = l_in_node[ j_out$name ]
+    df = j_out$sigmaProp_by_tau * local_foi
+    sum(df, na.rm = TRUE)
+}
+
+
+
+# FOI
+# ------------------------------------------------------------------------------
+foi_fxn = function(df_TS, vert_list, j_out, r_beta = 0.50){
+
+    vert_info = vert_list[[1]] # vert_info
+    comp1_sub = vert_list[[2]] # comp1_sub
+    comp2_sub = vert_list[[3]] # comp2_sub
+    
+    vert_info$I = df_TS[[4]] # $I 
+    vert_info$Ia = df_TS[[5]] * r_beta # $Ia * r_beta 
+
+                      #$I       #$Ia * r_beta
+    comp1_i = (vert_info[[6]] + vert_info[[7]]) * comp1_sub
+    
+    comp2_i = sapply(comp2_sub, comp2_i_fxn,
+                     structure(vert_info[[6]], names = vert_info$name),  # $I
+                     structure(vert_info[[7]], names = vert_info$name)) #$Ia
+
+    ## onwards to FOI
+                        # $b_by_n 
+    l_in_node_val = (vert_info[[4]] * (comp1_i + comp2_i))/vert_info[[5]] # $sigma_by_tau_p1
+
+    l_ji  = sapply(j_out, l_ji_fxn, l_in_node_val)
+
+    # foi
+    l_in_node_val + l_ji
+}
+
+## ## Testing that the empty dfs are the same for both comp and j_in
+## l = lfun(comp2_i)
+
+## lfun = function(x) {
+##     df = lapply(x, length)
+##     df = do.call(rbind, df)
+##     return(df)
+## }
+
+## l_j_in = lfun(j_in)
+## which(l_j_in == 0) == which(l == 0)
+
+
+
+
+
+# ==============================================================================
+# Functions to transition between SEIR compartments
+# ==============================================================================
+
+S_to_E = function(S, p)
+    rbinom(n = 1, size = S, prob = p)
+
+
+
+E_to_I = function(E, p)
+    rbinom(n = 1, size = E, prob = p)
+
+
+
+I_to_R = function(I, p)
+    rbinom(n = 1, size = I, prob = p)
+
+# For transitioning to Inf or asymptomatic infectious, use rmultinom (to
+# draw from a multinomial distribution
+# e.g
+# mapply(rmultinom,size = c(3, 7, 3, 5, 6, 1, 2),
+       # MoreArgs = list(n = 1, prob = c(0.2, 0.8)))
+
+# If I don't use MoreArgs like above, I'll get an error. E.g.:
+# > mapply(rmultinom,size = c(3, 7, 3, 5, 6, 1, 2), n = 1, prob = c(0.2, 0.8))
+# [1] 3 7 3 5 6 1 2
+# Warning message:
+# In mapply(rmultinom, size = c(3, 7, 3, 5, 6, 1, 2), n = 1, prob = c(0.2,  :
+  # longer argument not a multiple of length of shorter
+
+
+
+# ==============================================================================
+# Sim Take II
+# ==============================================================================
+
+sim_lapply_fxn = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir){
+    # browser()
+    TS = vector("list", nsteps)
+    TS_sum = matrix(NA, nrow = nsteps, ncol = 5)
+    colnames(TS_sum) = c("S", "E", "I", "Ia", "R")
+    prev_TS = start_TS
+    n = nrow(prev_TS)    
+
+    cat("-------------------------------------------------------\n")
+    cat("******** Simulation ", sim, "\n") 
+
+    for(i in 1:nsteps){
+        cat("\r\t\t\tTimestep: ", i, "/", nsteps, sep = "")
+        
+        E = rbinom(n, prev_TS$S, prev_TS$foi)
+        exit_E = mapply(rmultinom, size = prev_TS$E,
+                        MoreArgs = list(n = 1,
+                                        prob = c(params$exit_latent_I,
+                                                 params$exit_latent_Ia)))
+        I = exit_E[1, ]
+        Ia = exit_E[2, ]
+        R_I = rbinom(n, prev_TS$I, params$mu)
+        R_Ia = rbinom(n, prev_TS$Ia, params$mu)        
+
+        new_S = prev_TS$S - E
+        new_E = prev_TS$E + E - (I + Ia)
+        new_I = prev_TS$I + I - R_I
+        new_Ia = prev_TS$Ia + Ia - R_Ia
+        new_R = prev_TS$R + R_I + R_Ia
+
+        new_TS = data.frame(name = prev_TS$name,
+                            S = new_S,
+                            E = new_E,
+                            I = new_I,
+                            Ia = new_Ia,
+                            R = new_R,
+                            stringsAsFactors = FALSE)
+
+
+        if((sum(new_E) + sum(new_I) + sum(new_Ia)) == 0){
+            TS[[i]] = new_TS
+            TS[(i + 1):nsteps] = NULL
+            TS_sum[i, ] = colSums(new_TS[ , -c(1)])
+            TS_sum = TS_sum[ -((i + 1):nsteps), ]
+            break
+        }
+
+        new_TS$foi = foi_fxn(new_TS, vert_list, j_out)
+        TS[[i]] = new_TS
+        TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
+        prev_TS = new_TS
+    }
+    saveRDS(TS, paste0(sim_dir, sim, ".RDS"))
+    saveRDS(TS_sum, paste0(sim_dir, sim, "_info.RDS"))
+    cat("\n")
+    return()
+}
+
+
+
+
+sim_fxn = function(nsims, nsteps, sim_input, sim_dir) {
+    # create directory to store results in
+    if( !dir.exists(sim_dir) ) {
+        dir.create(sim_dir)
+    }
+    # start simulation message
+    cat("\nStarting simulations\n")
+    # set seed to ensure replicability
+    set.seed(0)
+    # simulations
+    sim_res = lapply(1:nsims, sim_lapply_fxn,
+                     nsteps,
+                     start_TS = sim_input$start_TS,
+                     vert_list = sim_input$vert_list,
+                     j_out = sim_input$j_out,
+                     params = sim_input$params,
+                     sim_dir = sim_dir)
+    return()
+}
+
+    
+
+
+
+
+
+
+
