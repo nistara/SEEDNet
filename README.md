@@ -5,7 +5,7 @@ Compiling the existing code and data into a package for better collaboration.
 by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.  
 
 ## Example datasets
-While a smaller example dataset is included in `inst/sampleData`, the bigger examples can be found in this (Google Drive link)[https://drive.google.com/open?id=1Mr6PKOlWHHRE_rl9d4-ZgtIO822DpwdM]. The include:
+While a smaller example dataset is included in `inst/sampleData`, the bigger examples can be found in this [Google Drive link](https://drive.google.com/open?id=1Mr6PKOlWHHRE_rl9d4-ZgtIO822DpwdM). The include:
 1. `g_raw.RDA`: For using with `disnet_commuting()`
 2. `g.RDA`: For using with `disnet_sim_setup()`
 3. `sim_intermed.RDA`: To run the `disnet_simulation()` function with. 
