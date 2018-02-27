@@ -315,17 +315,14 @@ disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
 # ==============================================================================
 # Functions to transition between SEIR compartments
 # ==============================================================================
-#'@export
 S_to_E = function(S, p)
     rbinom(n = 1, size = S, prob = p)
 
 
-#'@export
 E_to_I = function(E, p)
     rbinom(n = 1, size = E, prob = p)
 
 
-#'@export
 I_to_R = function(I, p)
     rbinom(n = 1, size = I, prob = p)
 
