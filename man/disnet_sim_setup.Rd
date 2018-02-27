@@ -6,9 +6,8 @@
 \usage{
 disnet_sim_setup(g, r0 = 1.44, latent_period = 2.62, inf_period = 3.38,
   tau = 3, r_beta = 0.5, p_a = 1/3, seed_nd = NA, seed_no = 1,
-  vacc = FALSE, output_dir = getOption("disnetOutputDir",
-  "disnet_output_dir"), vacc_eff = c(80, 90), vacc_cov = c(80, 100),
-  vacc_nd = "890", ...)
+  vacc = FALSE, output_dir = getOption("disnetOutputDir", NA),
+  vacc_eff = c(80, 90), vacc_cov = c(80, 100), vacc_nd = "890", ...)
 }
 \arguments{
 \item{g}{The network object created after commuting rates were calculated}
