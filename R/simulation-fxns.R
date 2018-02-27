@@ -5,6 +5,7 @@
 # Based on the formula written for simplified model (on green page)
 # -----------------------------------------------------------------
 
+#'@export
 disnet_eff_pop = function(g, tau = 3) {
     verts = igraph::as_data_frame(g, "vertices")
     edges = igraph::as_data_frame(g, "edges")
@@ -37,16 +38,16 @@ disnet_eff_pop1 = function(df, tau) {
 # older version
 if(FALSE){
     effective_pop_II = function(i, j, g, tau = 3) {
-        ## Populations of neighboring incoming nodes 'i'
+        # Populations of neighboring incoming nodes 'i'
         N_i = vertex_attr(g, "pop", i)
 
-        ## Commuting proportion of 'i'
+        # Commuting proportion of 'i'
         sigma_i = vertex_attr(g, "sigma", i)
 
-        ## Commuting proportion from 'i' to 'j'
+        # Commuting proportion from 'i' to 'j'
         sigma_ij = igraph::edge_attr(g, "commuting_prop", paste0(i, "|", j))
 
-        ## Second component of formula:
+        # Second component of formula:
         N_ij = N_i * ((sigma_ij/tau) / (1 + (sigma_i/tau)))
         # N_ij = as.data.frame(N_ij)
         return(N_ij)
@@ -57,24 +58,24 @@ if(FALSE){
     effective_pop_I = function(j, g, tau = 3) {
         print(paste0("Effective population for ", j))
 
-        ## Populations of node 'j'
+        # Populations of node 'j'
         N_j = igraph::vertex_attr(g, "pop", j)
 
-        ## Commuting proportion of 'j'
+        # Commuting proportion of 'j'
         sigma_j = igraph::vertex_attr(g, "sigma", j)
 
-        ## Solve first component of Nj* formula
+        # Solve first component of Nj* formula
         N_jj = N_j / (1 + (sigma_j/tau))
 
-        ## Identify neighboring incoming nodes, 'i'
+        # Identify neighboring incoming nodes, 'i'
         i = names(igraph::neighbors(g, j, "in"))
 
-        ## Calulate the individual second components of formula,
-        ## which are then summed up
+        # Calulate the individual second components of formula,
+        # which are then summed up
         N_ij = sapply(i, effective_pop_II, j, g)
         sum_N_ij = sum(N_ij)
 
-        ## N_eff_j = Nj*, the effective population
+        # N_eff_j = Nj*, the effective population
         N_eff_j = N_jj + sum_N_ij
         N_eff_j
     }
@@ -85,7 +86,7 @@ if(FALSE){
         eff_pop = lapply(j, effective_pop_I, g)
         eff_pop = do.call(rbind, eff_pop)
         eff_pop = round(eff_pop)
-        ## Include the eff pop as a vertex attribute in graph
+        # Include the eff pop as a vertex attribute in graph
         g = igraph::set_vertex_attr(g, "eff_pop", value = eff_pop)
         g
     }
@@ -96,12 +97,13 @@ if(FALSE){
 # Add sigma and sigmaProp_by_tau
 # ==============================================================================
 
+#'@export
 disnet_add_sigmas = function(g, tau){
-    ## calculate sigma_by_tau and sigmaProp_by_tau
+    # calculate sigma_by_tau and sigmaProp_by_tau
     sigma_by_tau = igraph::vertex_attr(g, "sigma")/tau
     sigmaProp_by_tau = igraph::edge_attr(g, "commuting_prop")/tau
 
-    ## add the two as vertex and edge attribute respectively
+    # add the two as vertex and edge attribute respectively
     g = igraph::set_vertex_attr(g, "sigma_by_tau", value = sigma_by_tau)
     g = igraph::set_edge_attr(g, "sigmaProp_by_tau", value = sigmaProp_by_tau)
     return(g)
@@ -112,6 +114,7 @@ disnet_add_sigmas = function(g, tau){
 # Initializing start_TS dataframe
 # ==============================================================================
 
+#'@export
 disnet_start_TS = function(g){
     verts = igraph::as_data_frame(g, "vertices")
     S = round(igraph::vertex_attr(g, "pop"))
@@ -130,6 +133,7 @@ disnet_start_TS = function(g){
 # Seed node function
 # ==============================================================================
 
+#'@export
 disnet_seed_nd = function(df, nd, inf){
     seed_row = which(df$name %in% nd)
     df[seed_row, c("S", "I")] = c(df$S[seed_row] -  inf, inf)
@@ -142,7 +146,7 @@ disnet_seed_nd = function(df, nd, inf){
 # FOI Take II!
 # ==============================================================================
 
-
+#'@export
 disnet_vert_info = function(g, beta){
     df = igraph::as_data_frame(g, "vertices")
     df = df[  , c("name", "eff_pop", "sigma_by_tau")]
@@ -153,23 +157,24 @@ disnet_vert_info = function(g, beta){
 
 
 
-## net_neighbors_fxn
-## -----------------------------------------------------------------------------
-## Gets neighbor info specific to whether the edge is incoming or outgoing
-##      i.e.  2 neighbor modes: "in" or "out"
-## 
-## I. For incoming edges, it provides:
-##    -------------------------------
-##      1. name of neighbors commuting to node
-##      2. sigma_by_tau_p1: sigma_by_tau + 1
-##      3. sigmaProp_by_tau: proportion of neighbor pop commuting to node
-##
-## II. For outgoing edges, it provides:
-##     -------------------------------
-##      1. name of neighbors to which node is commuting to
-##      2. sigmaProp_by_tau: proportion of node pop commuting to neighbor
-##
+# net_neighbors_fxn
+# -----------------------------------------------------------------------------
+# Gets neighbor info specific to whether the edge is incoming or outgoing
+#      i.e.  2 neighbor modes: "in" or "out"
+# 
+# I. For incoming edges, it provides:
+#    -------------------------------
+#      1. name of neighbors commuting to node
+#      2. sigma_by_tau_p1: sigma_by_tau + 1
+#      3. sigmaProp_by_tau: proportion of neighbor pop commuting to node
+#
+# II. For outgoing edges, it provides:
+#     -------------------------------
+#      1. name of neighbors to which node is commuting to
+#      2. sigmaProp_by_tau: proportion of node pop commuting to neighbor
+#
 
+#'@export
 net_neighbors_fxn = function(vert, g, m, vert_info){
     neigh_name = names(igraph::neighbors(graph = g, v = vert, mode = m))
     if(length(neigh_name) != 0){
@@ -201,8 +206,9 @@ net_neighbors_fxn = function(vert, g, m, vert_info){
 
 
 
-## j_in function (wraps up the net_neighbors_fxn for incoming edges)
-## -----------------------------------------------------------------------------
+# j_in function (wraps up the net_neighbors_fxn for incoming edges)
+# -----------------------------------------------------------------------------
+#'@export
 disnet_j_in = function(vert_info, g){
     j = vert_info$name
     j_in = lapply(setNames(j, j), net_neighbors_fxn, g, m = "in", vert_info)
@@ -211,8 +217,9 @@ disnet_j_in = function(vert_info, g){
 
 
 
-## j_out function (wraps up the net_neighbors_fxn for outgoing edges)
-## -----------------------------------------------------------------------------
+# j_out function (wraps up the net_neighbors_fxn for outgoing edges)
+# -----------------------------------------------------------------------------
+#'@export
 disnet_j_out = function(vert_info, g){
     j = vert_info$name
     j_out = lapply(setNames(j, j), net_neighbors_fxn, g, m = "out", vert_info)
@@ -221,8 +228,9 @@ disnet_j_out = function(vert_info, g){
 
 
 
-## component 2 sub (minus I)
-## -----------------------------------------------------------------------------
+# component 2 sub (minus I)
+# -----------------------------------------------------------------------------
+#'@export
 disnet_comp2_sub = function(j_in){
     if(length(j_in) != 0){
         name = j_in$name
@@ -238,10 +246,9 @@ disnet_comp2_sub = function(j_in){
 }
 
 
-## component 2 with I
-## -----------------------------------------------------------------------------
-
-
+# component 2 with I
+# -----------------------------------------------------------------------------
+#'@export
 comp2_i_fxn = function(comp, vI, vIa)#, vname)
 {
     df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
@@ -249,9 +256,9 @@ comp2_i_fxn = function(comp, vI, vIa)#, vname)
 }
 
 
-## calculate l_ji part
-## -----------------------------------------------------------------------------
-
+# calculate l_ji part
+# -----------------------------------------------------------------------------
+#'@export
 l_ji_fxn = function(j_out, l_in_node){
     local_foi = l_in_node[ j_out$name ]
     df = j_out$sigmaProp_by_tau * local_foi
@@ -262,6 +269,7 @@ l_ji_fxn = function(j_out, l_in_node){
 
 # FOI
 # ------------------------------------------------------------------------------
+#'@export
 disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
 
     vert_info = vert_list[[1]] # vert_info
@@ -278,7 +286,7 @@ disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
                      structure(vert_info[[6]], names = vert_info$name),  # $I
                      structure(vert_info[[7]], names = vert_info$name)) #$Ia
 
-    ## onwards to FOI
+    # onwards to FOI
     # $b_by_n 
     l_in_node_val = (vert_info[[4]] * (comp1_i + comp2_i))/vert_info[[5]] # $sigma_by_tau_p1
 
@@ -288,17 +296,17 @@ disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
     l_in_node_val + l_ji
 }
 
-## ## Testing that the empty dfs are the same for both comp and j_in
-## l = lfun(comp2_i)
+# # Testing that the empty dfs are the same for both comp and j_in
+# l = lfun(comp2_i)
 
-## lfun = function(x) {
-##     df = lapply(x, length)
-##     df = do.call(rbind, df)
-##     return(df)
-## }
+# lfun = function(x) {
+#     df = lapply(x, length)
+#     df = do.call(rbind, df)
+#     return(df)
+# }
 
-## l_j_in = lfun(j_in)
-## which(l_j_in == 0) == which(l == 0)
+# l_j_in = lfun(j_in)
+# which(l_j_in == 0) == which(l == 0)
 
 
 
@@ -307,17 +315,17 @@ disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
 # ==============================================================================
 # Functions to transition between SEIR compartments
 # ==============================================================================
-
+#'@export
 S_to_E = function(S, p)
     rbinom(n = 1, size = S, prob = p)
 
 
-
+#'@export
 E_to_I = function(E, p)
     rbinom(n = 1, size = E, prob = p)
 
 
-
+#'@export
 I_to_R = function(I, p)
     rbinom(n = 1, size = I, prob = p)
 
@@ -339,7 +347,7 @@ I_to_R = function(I, p)
 # ==============================================================================
 # Simulations ahoy
 # ==============================================================================
-
+#'@export
 disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir){
     # browser()
     TS = vector("list", nsteps)
