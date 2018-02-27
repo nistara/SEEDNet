@@ -25,3 +25,6 @@ list(sim = sim, info = info)
 - provide Duncan with link to actual big data
 - make ebo-net or rather, disnet!
 
+* Friday, February 23, 2018
+- profiling commuting and other functions
+- basic rprof

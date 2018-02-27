@@ -5,7 +5,7 @@
 \title{Main simulation function}
 \usage{
 disnet_simulate(nsims = 10, nsteps = 1000, sim_input = sim_intermed,
-  sim_output_dir = getOption("disnetOutputDir", "disnet_output_dir"))
+  sim_output_dir = getOption("disnetOutputDir", NA))
 }
 \arguments{
 \item{nsims}{The number of simulations to run. Default is 10}
@@ -31,5 +31,5 @@ nodes = igraph::vcount(g_comm)
 set.seed(890)
 seed_nd = igraph::vertex_attr(g_comm, "name", sample(1:nodes, 1))
 for_sim = disnet_sim_setup(g_comm, seed_nd = seed_nd, output_dir = NA)
-simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA)
+simres = disnet_simulate(sim_input = for_sim)
 }
