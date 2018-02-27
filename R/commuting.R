@@ -78,6 +78,8 @@ disnet_commuting = function(g)
 #' @param i the node for which commuting proportion is being calculated
 #' @param edges_subset subset of `nd_edges` with all outgoing edges of `i`
 #' @param j all the nodes `i` is connected to
+#' 
+#' @export
 
 disnet_comm1 = function(j, edges_subset, i) {
     radius = edges_subset$Total_Length[ edges_subset$to %in% j]
@@ -103,6 +105,7 @@ disnet_comm1 = function(j, edges_subset, i) {
 #' @param test_edges the dataframe of the edges which contains the distances
 #' between the nodes and the population of each edges's
 #                   `from` and `to nodes.
+#' @export
 
 disnet_comm2 = function(i,test_edges) {
     edges_subset = test_edges[ test_edges$from %in% i, ]
@@ -121,7 +124,8 @@ disnet_comm2 = function(i,test_edges) {
 #' Preps the incoming graph for commuting rate calculation
 #'
 #' @param g graph whose commuting rate needs to be calculated
-#'
+#' 
+#' @export
 
 disnet_comm3 = function(g){
     
