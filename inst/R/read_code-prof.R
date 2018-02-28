@@ -4,7 +4,7 @@
 
 # THE RESULTS FOLDER: disnet/inst/r-prof-out/
 
-# The results of "ctr" and "prof" are dividied into 3 sections:
+# The results of "ctr" and "prof" are divided into 3 sections:
 # ------------------------------------------------------------------------------
 # 
 # 1. Commuting calculation part:
