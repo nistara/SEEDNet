@@ -1,5 +1,5 @@
 # ******************************************************************************
-# Scrap R file for running test/intermediate R code and analyses
+# For running test/intermediate R code and analyses
 # ******************************************************************************
 
 if(FALSE) {
