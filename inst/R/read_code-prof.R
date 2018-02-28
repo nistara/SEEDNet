@@ -17,7 +17,6 @@
 # simres = disnet_simulate(sim_input = for_sim, nsims = 2)
 #
 
-# Function counter
 ctr = lapply(list.files("inst/r-prof-out",
                         pattern = "ctr_",
                         full.names = TRUE), readRDS)
