@@ -29,4 +29,7 @@ trace(f, st$update, print = FALSE)
 invisible (  k()  )
 z = st$value()
 z[[1]]
-length(z)
+
+
+
+
