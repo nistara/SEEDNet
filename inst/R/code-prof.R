@@ -1,5 +1,7 @@
-# devtools::install_github("nistara/CallCounter")
-# devtools::install_github("nistara/disnet")
+if(FALSE) {
+    devtools::install_github("duncantl/CallCounter")
+    devtools::install_github("nistara/disnet")
+}
 
 library(disnet)
 library(CallCounter)
