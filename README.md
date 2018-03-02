@@ -21,7 +21,7 @@ I - Infectious
 R - Recovered
 
 ## Main functions
-1. `disnet_commuting` - Comuting function. Takes in network object (in `graphml` format, and calculates the commuting rates for all outgoing edges in network
+1. `disnet_commuting` - Comuting function. Takes in network object (in `graphml` format), and calculates the commuting rates for all outgoing edges in network
    
 2. `disnet_sim_setup` - Simulation setup function. Takes in the graph file with commuting rates added to it, and preps it up for runnning simulations. 
 
