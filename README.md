@@ -29,6 +29,8 @@ R - Recovered
 
 
 ```r
+library("disnet")
+
 # Read in sample graph/network
 f = system.file("sampleData", "g.rds", package = "disnet")
 g = readRDS(f)
@@ -46,6 +48,9 @@ for_sim = disnet_sim_setup(g_comm, seed_nd = seed_nd, output_dir = NA)
 
 # run the simulations over the network
 simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA)
+
+simres2 = disnet_simulate(sim_input = for_sim, sim_output_dir = NA,
+parallel = TRUE)
 ```
 
 ## Sample datasets

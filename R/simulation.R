@@ -26,7 +26,8 @@
 disnet_simulate = function(nsims = 10,
                    nsteps = 1000,
                    sim_input = sim_intermed,
-                   sim_output_dir = getOption("disnetOutputDir", NA))
+                   sim_output_dir = getOption("disnetOutputDir", NA),
+                   parallel = FALSE)
 {
     # create directory to store results in
     if(!is.na(sim_output_dir) && !dir.exists(sim_output_dir)) {
@@ -35,9 +36,15 @@ disnet_simulate = function(nsims = 10,
     # start simulation message
     message("\nStarting simulations\n")
     # set seed to ensure replicability
+# Clark: Let the user set the seed before they call this function.
     set.seed(0)
     # simulations
-    sim_res = lapply(1:nsims, disnet_sim_lapply,
+    this_lapply = if(parallel) parallel::mclapply else lapply
+
+# Clark: Better to use replicate() or parallel::clusterEvalQ() to avoid
+# passing the objects start_TS, etc.
+
+    sim_res = this_lapply(1:nsims, disnet_sim_lapply,
                      nsteps,
                      start_TS = sim_input$start_TS,
                      vert_list = sim_input$vert_list,
