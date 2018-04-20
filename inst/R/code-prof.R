@@ -15,7 +15,10 @@ funs = as.character(ls.str("package:disnet"))
 
 ctr = countMCalls(funs = funs)
 g = readRDS("~/Drive/projects/ebo-net/data/flu-net_data/flu-g.RDS")
-g = igraph::induced.subgraph(g, c("890", sample(1:1000, 100)))
+
+drivelink = "https://drive.google.com/drive/folders/1LXWqX_cBLV2pyA_b3kdqHPiyQTcTN_zU?usp=sharing"
+
+g = igraph::induced.subgraph(g, c("890", sample(1:1000, 200)))
 
 Rprof("prof_disnet_comm.out")
 # calculate commuting rates over it
@@ -31,7 +34,8 @@ if( FALSE){
 ctr = countMCalls(funs = funs)
 Rprof("prof_disnet_setup.out")
 # set up the network for simulations
-for_sim = disnet_sim_setup(g_comm, seed_nd = "890", output_dir = NA)
+for_sim = disnet_sim_setup(g_comm, seed_nd = "890",
+                           output_dir = NA)
 Rprof(NULL)
 saveRDS(ctr$value(), "ctr_disnet_setup.RDS")
 
@@ -42,7 +46,8 @@ if(FALSE){
 ctr = countMCalls(funs = funs)
 Rprof("prof_disnet_sim.out")
 # run the simulations over the network
-simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA)
+simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA,
+                         nsims=100)
 Rprof(NULL)
 saveRDS(ctr$value(), "ctr_disnet_sim.RDS")
 
