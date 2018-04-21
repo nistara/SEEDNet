@@ -255,7 +255,8 @@ comp2_i_fxn = function(comp, vI, vIa)#, vname)
     sum(df, na.rm = TRUE)
 }
 
-comp2_i_fxn = function(comp, vI, vIa, idx = comp[[3]])#, vname)
+comp2_i_fxn = function(comp, vI, vIa,
+                       idx = if(length(comp) >= 3) comp[[3]] else comp$name) # , vname)
 {
     df = (vI[idx] + vIa[idx]) * comp$comp2_sub
     sum(df, na.rm = TRUE)
@@ -265,8 +266,8 @@ comp2_i_fxn = function(comp, vI, vIa, idx = comp[[3]])#, vname)
 # calculate l_ji part
 # -----------------------------------------------------------------------------
 #'@export
-l_ji_fxn = function(j_out, l_in_node){
-    local_foi = l_in_node[ j_out[[3]] ] # was j_out$idx  and befoer that was j_out$name
+l_ji_fxn = function(j_out, l_in_node, idx = if(length(j_out) >= 3) j_out[[3]] else j_out$name){
+    local_foi = l_in_node[ idx ] # was j_out$idx  and before that was j_out$name
               # $sigmaProp_by_tau
     df = j_out[[2]] * local_foi
     sum(df, na.rm = TRUE)
@@ -398,7 +399,9 @@ if(!old) {
     idx = match(rowIds, vert_list[[1]]$name)    
 }
 
-
+    ##XX for each of the data frames in vert_list[[3]] and also j_out, take their names
+    # and match them to vert_list[[1]]$name and store in $idx in each data frame
+    #?? Assuming these indices don't change over the simulation.
     vert_list[[3]] = addIndices(vert_list[[3]], vert_list[[1]]$name)
     j_out = addIndices(j_out, vert_list[[1]]$name)
     
