@@ -281,7 +281,16 @@ disnet_foi = function(df_TS, vert_list, j_out, r_beta = 0.50){
 
     #$I       #$Ia * r_beta
     comp1_i = (vert_info[[6]] + vert_info[[7]]) * comp1_sub
-    
+
+    # comp2_sub doesn't change across. vert_info[[6]] and [[7]] do.
+    #    doCompSum(comp2_sub, vert_info[[6]], vert_info[[7]])
+if(FALSE)   {
+    rowIds = unlist(lapply(comp2_sub, `[[`, 1))
+    groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+    idx = match(rowIds, vert_info$name)
+    tmp = (vert_info[[6]][idx] + vert_info[[7]][idx])*unlist(lapply(comp2_sub, `[[`, 2))
+    comp2_i = tapply(tmp, groups, sum)
+} else    
     comp2_i = sapply(comp2_sub, comp2_i_fxn,
                      structure(vert_info[[6]], names = vert_info$name),  # $I
                      structure(vert_info[[7]], names = vert_info$name)) #$Ia
