@@ -255,13 +255,20 @@ comp2_i_fxn = function(comp, vI, vIa)#, vname)
     sum(df, na.rm = TRUE)
 }
 
+comp2_i_fxn = function(comp, vI, vIa, idx = comp[[3]])#, vname)
+{
+    df = (vI[idx] + vIa[idx]) * comp$comp2_sub
+    sum(df, na.rm = TRUE)
+}
+
 
 # calculate l_ji part
 # -----------------------------------------------------------------------------
 #'@export
 l_ji_fxn = function(j_out, l_in_node){
-    local_foi = l_in_node[ j_out$name ]
-    df = j_out$sigmaProp_by_tau * local_foi
+    local_foi = l_in_node[ j_out[[3]] ] # was j_out$idx  and befoer that was j_out$name
+              # $sigmaProp_by_tau
+    df = j_out[[2]] * local_foi
     sum(df, na.rm = TRUE)
 }
 
@@ -270,13 +277,26 @@ l_ji_fxn = function(j_out, l_in_node){
 # FOI
 # ------------------------------------------------------------------------------
 #'@export
-disnet_foi = function(df_TS, vert_list, j_out, idx, acomp2_sub, r_beta = 0.50){
+disnet_foi = function(df_TS, vert_list, j_out, idx = NULL, acomp2_sub = NULL, groups = NULL, r_beta = 0.50, old = TRUE){
 
     # vert_list doesn't change across calls.
     vert_info = vert_list[[1]] # vert_info
     comp1_sub = vert_list[[2]] # comp1_sub
+#Not needed if idx, acomp2_sub and groups provided.    
     comp2_sub = vert_list[[3]] # comp2_sub
 
+if(!old) {    
+    if(is.null(acomp2_sub)) 
+        acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
+    if(is.null(idx)) {
+        rowIds = unlist(lapply(comp2_sub, `[[`, 1))
+        idx = match(rowIds, vert_info$name)    
+    }
+    if(is.null(groups)) {
+        groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+    }
+}
+    
     #!! These change across calls.
     I = df_TS[[4]] # $I 
     Ia = df_TS[[5]] * r_beta # $Ia * r_beta 
@@ -286,8 +306,7 @@ disnet_foi = function(df_TS, vert_list, j_out, idx, acomp2_sub, r_beta = 0.50){
 
     # comp2_sub doesn't change across. vert_info[[6]] and [[7]] do.
     #    doCompSum(comp2_sub, vert_info[[6]], vert_info[[7]])
-if(TRUE)   {
-   
+if(!old)   {
     tmp = (I[idx] + Ia[idx])*acomp2_sub
     comp2_i = sapply(split(tmp, groups), sum)
 } else    
@@ -349,6 +368,11 @@ I_to_R = function(I, p)
 # longer argument not a multiple of length of shorter
 
 
+addIndices =
+function(comps, names)
+{
+  lapply(comps, function(x) { x$idx = match(x$name, names) ; x})
+}
 
 # ==============================================================================
 # Simulations ahoy
@@ -365,12 +389,19 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     cat("-------------------------------------------------------\n")
     cat("******** Simulation ", sim, "\n")
 
-    
+old = TRUE
+if(!old) {    
+    comp2_sub = vert_list[[3]]
     rowIds = unlist(lapply(comp2_sub, `[[`, 1))
     groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
     acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
-    idx = match(rowIds, vert_info$name)    
+    idx = match(rowIds, vert_list[[1]]$name)    
+}
 
+
+    vert_list[[3]] = addIndices(vert_list[[3]], vert_list[[1]]$name)
+    j_out = addIndices(j_out, vert_list[[1]]$name)
+    
     for(i in 1:nsteps){
         cat("\r\t\t\tTimestep: ", i, "/", nsteps, sep = "")
         
@@ -407,7 +438,11 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
             break
         }
 
-        new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub)
+if(!old)        
+    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups)
+else        
+    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, old = TRUE)
+        
         TS[[i]] = new_TS
         TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
         prev_TS = new_TS
