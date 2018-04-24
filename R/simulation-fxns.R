@@ -5,6 +5,7 @@
 # Based on the formula written for simplified model (on green page)
 # -----------------------------------------------------------------
 
+# *** disnet_eff_pop
 #'@export
 disnet_eff_pop = function(g, tau = 3) {
     verts = igraph::as_data_frame(g, "vertices")
@@ -96,7 +97,7 @@ if(FALSE){
 # ==============================================================================
 # Add sigma and sigmaProp_by_tau
 # ==============================================================================
-
+# *** disnet_add_sigmas
 #'@export
 disnet_add_sigmas = function(g, tau){
     # calculate sigma_by_tau and sigmaProp_by_tau
@@ -113,7 +114,7 @@ disnet_add_sigmas = function(g, tau){
 # ==============================================================================
 # Initializing start_TS dataframe
 # ==============================================================================
-
+# *** disnet_start_TS
 #'@export
 disnet_start_TS = function(g){
     verts = igraph::as_data_frame(g, "vertices")
@@ -132,7 +133,7 @@ disnet_start_TS = function(g){
 # ==============================================================================
 # Seed node function
 # ==============================================================================
-
+# *** disnet_seed_nd
 #'@export
 disnet_seed_nd = function(df, nd, inf){
     seed_row = which(df$name %in% nd)
@@ -145,7 +146,7 @@ disnet_seed_nd = function(df, nd, inf){
 # ==============================================================================
 # FOI Take II!
 # ==============================================================================
-
+# *** disnet_vert_info
 #'@export
 disnet_vert_info = function(g, beta){
     df = igraph::as_data_frame(g, "vertices")
@@ -156,7 +157,7 @@ disnet_vert_info = function(g, beta){
 }
 
 
-
+# *** net_neighbors_fxn
 # net_neighbors_fxn
 # -----------------------------------------------------------------------------
 # Gets neighbor info specific to whether the edge is incoming or outgoing
@@ -206,6 +207,7 @@ net_neighbors_fxn = function(vert, g, m, vert_info){
 
 
 
+# *** disnet_j_in
 # j_in function (wraps up the net_neighbors_fxn for incoming edges)
 # -----------------------------------------------------------------------------
 #'@export
@@ -217,6 +219,7 @@ disnet_j_in = function(vert_info, g){
 
 
 
+# *** disnet_j_out
 # j_out function (wraps up the net_neighbors_fxn for outgoing edges)
 # -----------------------------------------------------------------------------
 #'@export
@@ -228,6 +231,7 @@ disnet_j_out = function(vert_info, g){
 
 
 
+# *** disnet_comp2_sub
 # component 2 sub (minus I)
 # -----------------------------------------------------------------------------
 #'@export
@@ -246,6 +250,7 @@ disnet_comp2_sub = function(j_in){
 }
 
 
+# *** comp2_i_fxn
 # component 2 with I
 # -----------------------------------------------------------------------------
 #'@export
@@ -256,6 +261,7 @@ comp2_i_fxn = function(comp, vI, vIa)#, vname)
 }
 
 
+# *** l_ji_fxn
 # calculate l_ji part
 # -----------------------------------------------------------------------------
 #'@export
@@ -267,6 +273,7 @@ l_ji_fxn = function(j_out, l_in_node){
 
 
 
+# *** disnet_foi
 # FOI
 # ------------------------------------------------------------------------------
 #'@export
@@ -344,6 +351,7 @@ I_to_R = function(I, p)
 # ==============================================================================
 # Simulations ahoy
 # ==============================================================================
+# *** disnet_sim_lapply
 #'@export
 disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir){
     # browser()
@@ -353,7 +361,7 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     prev_TS = start_TS
     n = nrow(prev_TS)    
 
-    cat("-------------------------------------------------------\n")
+    cat("\n-------------------------------------------------------\n")
     cat("******** Simulation ", sim, "\n") 
 
     for(i in 1:nsteps){

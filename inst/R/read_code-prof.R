@@ -22,6 +22,7 @@ ctr = lapply(list.files("inst/r-prof-out",
                         full.names = TRUE), readRDS)
 length(ctr)
 
+ctr
 
 prof = lapply(list.files("inst/r-prof-out",
                          pattern = "prof_",

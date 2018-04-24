@@ -1,6 +1,6 @@
 if(FALSE) {
     devtools::install_github("duncantl/CallCounter")
-    devtools::install_github("nistara/disnet")
+    devtools::install_github("nistara/disnet", "stash1")
 }
 
 library(disnet)
@@ -15,8 +15,6 @@ funs = as.character(ls.str("package:disnet"))
 
 ctr = countMCalls(funs = funs)
 g = readRDS("~/Drive/projects/ebo-net/data/flu-net_data/flu-g.RDS")
-
-drivelink = "https://drive.google.com/drive/folders/1LXWqX_cBLV2pyA_b3kdqHPiyQTcTN_zU?usp=sharing"
 
 g = igraph::induced.subgraph(g, c("890", sample(1:1000, 200)))
 
@@ -84,6 +82,7 @@ saveRDS(disnet_CallStack, "disnet_CallStack.RDS")
 # Reading in profiling data
 # ==============================================================================
 if(FALSE){
+    
     funs = as.character(ls.str("package:disnet"))
     ctr = lapply(list.files("inst/r-prof-out",
                             pattern = "ctr_",
@@ -92,6 +91,7 @@ if(FALSE){
                              pattern = "prof_",
                              full.names = TRUE), summaryRprof)
     call_stack = readRDS("inst/r-prof-out/disnet_CallStack.RDS")
+    
 }
 
 

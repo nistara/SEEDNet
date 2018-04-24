@@ -56,8 +56,16 @@ disnet_simulate = function(nsims = 10,
 
 # For testing
 if(FALSE){
-nsims = 10
+nsims = 1
 nsteps = 10
 sim_input = for_sim
 sim_output_dir = getOption("disnetOutputDir", "disnet_output_dir")
+
+sim = 1
+nsteps = 10
+start_TS = sim_input$start_TS
+vert_list = sim_input$vert_list
+j_out = sim_input$j_out
+params = sim_input$params
+sim_dir = NA
 }
