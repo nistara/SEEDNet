@@ -3,7 +3,8 @@ if(FALSE) {
     devtools::install_github("nistara/disnet")
 }
 
-library(disnet)
+#library(disnet)
+invisible(lapply(list.files("../../R", full = TRUE), source))
 library(CallCounter)
 
 # ==============================================================================
@@ -14,7 +15,7 @@ library(CallCounter)
 funs = as.character(ls.str("package:disnet"))
 
 ctr = countMCalls(funs = funs)
-g = readRDS("~/Drive/projects/ebo-net/data/flu-net_data/flu-g.RDS")
+g = readRDS("../sampleData/flu-g.RDS")
 
 drivelink = "https://drive.google.com/drive/folders/1LXWqX_cBLV2pyA_b3kdqHPiyQTcTN_zU?usp=sharing"
 
@@ -34,8 +35,7 @@ if( FALSE){
 ctr = countMCalls(funs = funs)
 Rprof("prof_disnet_setup.out")
 # set up the network for simulations
-for_sim = disnet_sim_setup(g_comm, seed_nd = "890",
-                           output_dir = NA)
+for_sim = disnet_sim_setup(g_comm, seed_nd = "890", output_dir = NA)
 Rprof(NULL)
 saveRDS(ctr$value(), "ctr_disnet_setup.RDS")
 
@@ -44,10 +44,10 @@ if(FALSE){
 }
 
 ctr = countMCalls(funs = funs)
-Rprof("prof_disnet_sim.out")
+ctr = countMCalls(funs = c("comp2_i_fxn", "l_ji_fxn", "disnet_foi", "[[.data.frame"))
+Rprof(profFile <- "prof_disnet_sim.out")
 # run the simulations over the network
-simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA,
-                         nsims=100)
+simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA, nsims=20)
 Rprof(NULL)
 saveRDS(ctr$value(), "ctr_disnet_sim.RDS")
 
