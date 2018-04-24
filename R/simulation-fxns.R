@@ -266,7 +266,8 @@ comp2_i_fxn = function(comp, vI, vIa,
 # calculate l_ji part
 # -----------------------------------------------------------------------------
 #'@export
-l_ji_fxn = function(j_out, l_in_node, idx = if(length(j_out) >= 3) j_out[[3]] else j_out$name){
+l_ji_fxn = function(j_out, l_in_node, idx = if(length(j_out) >= 3) j_out[[3]] else j_out$name)
+{
     local_foi = l_in_node[ idx ] # was j_out$idx  and before that was j_out$name
               # $sigmaProp_by_tau
     df = j_out[[2]] * local_foi
@@ -309,7 +310,8 @@ if(!old) {
     #    doCompSum(comp2_sub, vert_info[[6]], vert_info[[7]])
 if(!old)   {
     tmp = (I[idx] + Ia[idx])*acomp2_sub
-    comp2_i = sapply(split(tmp, groups), sum)
+    #    comp2_i = sapply(split(tmp, groups), sum)
+    comp2_i = tapply(tmp, groups, sum)    
 } else    
     comp2_i = sapply(comp2_sub, comp2_i_fxn,
                      structure(I, names = vert_info$name),  # $I
@@ -379,7 +381,7 @@ function(comps, names)
 # Simulations ahoy
 # ==============================================================================
 #'@export
-disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir){
+disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub, groups){
     # browser()
     TS = vector("list", nsteps)
     TS_sum = matrix(NA, nrow = nsteps, ncol = 5)
@@ -390,10 +392,12 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     cat("-------------------------------------------------------\n")
     cat("******** Simulation ", sim, "\n")
 
-old = TRUE
-if(!old) {    
+    old = FALSE# TRUE
+    # Lift this computation out to disnet_simulate() and then pass in these as parameters/arguments. No need for rowIds or comp2_sub
+if(!old && is.null(idx)) {      # missing(idx)
+  browser()
     comp2_sub = vert_list[[3]]
-    rowIds = unlist(lapply(comp2_sub, `[[`, 1))
+    rowIds = unlist(lapply(comp2_sub, `[[`, 1))   # doesn't get used after this computation.
     groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
     acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
     idx = match(rowIds, vert_list[[1]]$name)    
@@ -442,7 +446,7 @@ if(!old) {
         }
 
 if(!old)        
-    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups)
+    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups, old = FALSE)
 else        
     new_TS$foi = disnet_foi(new_TS, vert_list, j_out, old = TRUE)
         
