@@ -44,13 +44,15 @@ disnet_simulate = function(nsims = 10,
 # Clark: Better to use replicate() or parallel::clusterEvalQ() to avoid
 # passing the objects start_TS, etc.
 
+    tmp = getIdxAcomp2Groups(sim_input$vert_list)
     sim_res = this_lapply(1:nsims, disnet_sim_lapply,
                      nsteps,
                      start_TS = sim_input$start_TS,
                      vert_list = sim_input$vert_list,
                      j_out = sim_input$j_out,
                      params = sim_input$params,
-                     sim_dir = sim_output_dir)
+                     sim_dir = sim_output_dir,
+                     idx = tmp$idx, acomp2_sub = tmp$acomp2_sub, groups = tmp$groups)
     return(sim_res)
 }
 
@@ -60,4 +62,17 @@ nsims = 10
 nsteps = 10
 sim_input = for_sim
 sim_output_dir = getOption("disnetOutputDir", "disnet_output_dir")
+}
+
+
+
+getIdxAcomp2Groups =
+function(vert_list)
+{
+    comp2_sub = vert_list[[3]]
+    rowIds = unlist(lapply(comp2_sub, `[[`, 1))   # doesn't get used after this computation.
+    groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+    acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
+    idx = match(rowIds, vert_list[[1]]$name)
+    list(idx = idx, acomp2_sub = acomp2_sub, groups = groups)
 }
