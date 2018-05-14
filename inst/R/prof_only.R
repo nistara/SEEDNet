@@ -32,13 +32,12 @@ Rprof("inst/r-prof-out/sim_200nds.out")
 simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA,
                          nsims=100)
 Rprof(NULL)
-saveRDS(ctr$value(), "ctr_sim_200nds.RDS")
+saveRDS(ctr$value(), "inst/r-prof-out/ctr_sim_200nds.RDS")
 
 # *** Prof summary--------------------------------------------------------------
 
 summaryRprof("inst/r-prof-out/sim_200nds.out")
-ctr$value()
-
+readRDS("inst/r-prof-out/ctr_sim_200nds.RDS")
 
 # *** Call stack----------------------------------------------------------------
 if(FALSE)
