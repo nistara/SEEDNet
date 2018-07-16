@@ -155,7 +155,3 @@ disnet_comm3 = function(g){
 
 
 
-
-
-
-# tesing ssh!
