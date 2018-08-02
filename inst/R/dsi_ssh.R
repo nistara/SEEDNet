@@ -23,4 +23,5 @@ t = Sys.time()
 simres = disnet_simulate(sim_input = for_sim, sim_output_dir = NA, nsims=500)
 Sys.time() -  t
 
-
+# using comp2_i_fxn: time = Time difference of 6.249922 mins
+# usinf master branch: time = 
