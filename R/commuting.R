@@ -15,7 +15,8 @@
 #'
 #' `disnet_commuting` gets the `from` nodes, and sends them as the parameter for
 #' the disnet_comm2 along with the entire dataframe `nd_edges`.
-#' It incoporates both the individual and all nodes' functions
+#' It incoporates both the individual and all nodes' functions.
+#' Note: it removes nodes with less than 10 people in them. 
 #'
 #' @param g The `graphml` (network) object for which to calculate commuting rates
 #'
@@ -28,37 +29,37 @@
 disnet_commuting = function(g)
 {
     comm_info = disnet_comm3(g)
-    nd_edges = comm_info$nd_edges
-    i = unique(nd_edges$from)
-    cr = lapply(i, disnet_comm2, nd_edges)
-    nd_edges$commuting_prop = do.call(rbind, cr)
+    g_edges = comm_info$g_edges
+    i = unique(g_edges$from)
+    cr = lapply(i, disnet_comm2, g_edges)
+    g_edges$commuting_prop = do.call(rbind, cr)
 
-    verts_info = comm_info$nd_verts
+    verts_info = comm_info$g_verts
 
     # Calculating Sigma (total commuting prop for each node
-    verts_info$sigma = aggregate(commuting_prop ~ as.numeric(nd_edges$from),
-                                 data = nd_edges, FUN = sum)[["V1"]]
+    verts_info$sigma = aggregate(commuting_prop ~ as.numeric(g_edges$from),
+                                 data = g_edges, FUN = sum)[["V1"]]
 
     # rounding commuting proportion to 2 decimal places
     verts_info$sigma = round(verts_info$sigma, 2)
 
     ## Create graph file
-    g_comm = igraph::graph_from_data_frame(nd_edges,
+    g_comm = igraph::graph_from_data_frame(g_edges,
                                            directed = TRUE,
                                            vertices = verts_info)
 
     if(FALSE){
         # Check that the info is correct in the created graph:
-        nd_edges2 = igraph::as_data_frame(g_comm, what = "both")
+        g_edges2 = igraph::as_data_frame(g_comm, what = "both")
 
         # Checking Kigali, the largest node, named "890". Its pop match Kigali's
-        nd_edges2$vertices[ nd_edges2$vertices$name == "890", ]
+        g_edges2$vertices[ g_edges2$vertices$name == "890", ]
 
         # head and tail, to make sure the names corroborate with the graph vertices
-        head(nd_edges2$vertices, 10)
-        tail(nd_edges2$vertices, 10)
-        head(nd_edges2$edges)
-        head(nd_edges)
+        head(g_edges2$vertices, 10)
+        tail(g_edges2$vertices, 10)
+        head(g_edges2$edges)
+        head(g_edges)
 
         # Save the graph
         write.graph(g_comm, paste0("data/graphml/", Sys.Date(), "_graph-commuting.graphml"),
@@ -133,24 +134,108 @@ disnet_comm3 = function(g){
     df = igraph::as_data_frame(g, what = "both")
 
     # Node information
-    nd_verts = df$vertices
+    g_verts = df$vertices
 
     # Remove nodes with less than 10 people in them
-    # sum(nd_verts$pop < 10)
-    nd_verts = nd_verts[ !nd_verts$pop < 10, ]
-    nodes = unique(nd_verts$name)           #unique nodes
+    # sum(g_verts$pop < 10)
+    g_verts = g_verts[ !g_verts$pop < 10, ]
+    nodes = unique(g_verts$name)           #unique nodes
 
     # Edges
-    nd_edges = df$edges[ df$edges$from %in% nodes & df$edges$to %in% nodes, ] 
+    g_edges = df$edges[ df$edges$from %in% nodes & df$edges$to %in% nodes, ] 
 
     # Adding population data to edges
     # -----------------------------------------------------------------------------
-    pop_from = dplyr::inner_join(nd_edges, nd_verts, by = c("from" = "name"))["pop"]
-    nd_edges$pop_from = pop_from$pop
+    pop_from = dplyr::inner_join(g_edges, g_verts, by = c("from" = "name"))["pop"]
+    g_edges$pop_from = pop_from$pop
 
-    pop_to = dplyr::inner_join(nd_edges, nd_verts, by = c("to" = "name"))["pop"]
-    nd_edges$pop_to = pop_to$pop
-    list(nd_verts = nd_verts, nd_edges = nd_edges)
+    pop_to = dplyr::inner_join(g_edges, g_verts, by = c("to" = "name"))["pop"]
+    g_edges$pop_to = pop_to$pop
+    list(g_verts = g_verts, g_edges = g_edges)
 }
 
+
+
+# *** Take two
+
+disnet_commuting2 = function(g)
+{
+    comm_info = disnet_comm3(g)
+    g_edges = comm_info$g_edges
+    verts_info = comm_info$g_verts
+    from = factor(g_edges$from, levels = unique(g_edges$from))
+
+    edges_from = split(g_edges, from)
+
+    edges_from_to = lapply(edges_from, function(edges_from)
+    {
+        radii = edges_from$Total_Length
+        lapply(seq_along(radii), function(i, df, radis)
+        {
+            df = df[ df$Total_Length <= radii[i], ]
+        }, edges_from, radii)
+    })
+
+    cr = lapply(seq_along(edges_from_to), function(i, edges_from_to, edges_from)
+    {
+        df_radius = edges_from_to[[i]]
+        m_i = edges_from[[i]]$pop_from
+        n_j = edges_from[[i]]$pop_to
+        N_c = 0.11 # using 0.11 as commuting proportion from Simini paper
+        N = 1 # to get 0.11 as proportion
+        T_i = (N_c/N) # want only rate, not num people. original:  m_i * (N_c/N)
+        
+        s_ij = do.call(rbind, lapply(df_radius, function(df_radius)
+        {
+            sum(df_radius$pop_to) - df_radius$pop_to[1]
+        }))
+
+        T_ij = T_i * ( (m_i * n_j) / ((m_i + s_ij) * (m_i + n_j + s_ij)) )
+        T_ij
+    }, edges_from_to, edges_from)
+    
+
+    g_edges$commuting_prop = do.call(rbind, cr)
+
+
+
+    # Calculating Sigma (total commuting prop for each node
+    verts_info$sigma = aggregate(commuting_prop ~ as.numeric(g_edges$from),
+                                 data = g_edges, FUN = sum)[["V1"]]
+
+    # rounding commuting proportion to 2 decimal places
+    verts_info$sigma = round(verts_info$sigma, 2)
+
+    ## Create graph file
+    g_comm = igraph::graph_from_data_frame(g_edges,
+                                           directed = TRUE,
+                                           vertices = verts_info)
+
+    if(FALSE){
+        # Check that the info is correct in the created graph:
+        g_edges2 = igraph::as_data_frame(g_comm, what = "both")
+
+        # Checking Kigali, the largest node, named "890". Its pop match Kigali's
+        g_edges2$vertices[ g_edges2$vertices$name == "890", ]
+
+        # head and tail, to make sure the names corroborate with the graph vertices
+        head(g_edges2$vertices, 10)
+        tail(g_edges2$vertices, 10)
+        head(g_edges2$edges)
+        head(g_edges)
+
+        # Save the graph
+        write.graph(g_comm, paste0("data/graphml/", Sys.Date(), "_graph-commuting.graphml"),
+                    format = "graphml")
+
+    }
+
+    g_comm
+}
+
+
+
+    
+
+    
 
