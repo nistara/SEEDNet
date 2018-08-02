@@ -25,3 +25,4 @@ Sys.time() -  t
 
 # using comp2_i_fxn: time = Time difference of 6.249922 mins
 # using master branch: time = Time difference of 7.114581 mins
+# using stash1 branch: Time difference of 12.53686 mins
