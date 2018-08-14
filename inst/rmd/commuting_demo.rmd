@@ -1,0 +1,61 @@
+---
+title: Code optimization using commuting example
+output: pdf
+---
+
+### Commuting rate formula:
+
+The expected commuting rate $\sigma_{ji}$ from a source node $j$ and a destination node $i$ is:
+
+\begin{equation}
+\langle \sigma_{ji} \rangle = \sigma_j \frac{n_j n_i}{(n_j + s_{ji})(n_j + n_i + s_{ji})}
+\end{equation}
+
+where $n_j$ and $n_i$ are the populations for nodes $j$ and $i$, and $s_{ji}$ is the total population (excluding $j$ and $i$) in a circle centered on $j$ with a radius equal to the distance between $j$ and $i$. The total commuting rate of individuals in $j$ is $\sigma_j = N_c/N$ = 11%, where $N_c$ is the total number of commuters and $N$ is the total population in the country. 
+
+\  
+
+### External libraries used in this document:
+`here` and `igraph`
+
+
+### Sourcing code:
+
+```{r}
+invisible(lapply(here::here(list.files("R", full = TRUE)), source))
+```
+
+We're specifically working with code in the `R/commuting.R` file. 
+
+### Reading in example data:
+
+```{r}
+# read in data and make a subset of it
+g = readRDS(here::here("inst/sampleData/flu-g.RDS"))
+g = igraph::induced.subgraph(g, c("890", sample(1:1000, 250)))
+
+# network edges (distances between nodes)
+head(igraph::as_data_frame(g, "edges"))
+
+# network node information
+head(igraph::as_data_frame(g, "vertices"))
+```
+
+
+### Calculating commuting proportions:
+```{r, results = "hide"}
+# calculate commuting rates over it
+t1 = system.time(disnet_commuting(g))
+t2 = system.time(disnet_commuting2(g))
+```
+
+### Time taken by the two methods:
+```{r}
+# Method 1
+t1
+
+# Method 2
+t2
+```
+
+There's some improvement with the second method but definitely scope for better code optimization! 
