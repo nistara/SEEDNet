@@ -204,7 +204,7 @@ disnet_commuting2 = function(g)
                                  data = g_edges, FUN = sum)[["V1"]]
 
     # rounding commuting proportion to 2 decimal places
-    verts_info$sigma = round(verts_info$sigma, 2)
+    # verts_info$sigma = round(verts_info$sigma, 2)
 
     ## Create graph file
     g_comm = igraph::graph_from_data_frame(g_edges,

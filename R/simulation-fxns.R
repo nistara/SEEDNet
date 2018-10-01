@@ -16,11 +16,12 @@ disnet_eff_pop = function(g, tau = 3) {
                                          by = c("from" = "name"))[["sigma"]]
     # split edges by receipient 
     to_edges = split(edges, as.numeric(edges$to))
-    sum_N_ij = sapply(to_edges, disnet_eff_pop1, tau)
+    sum_N_ij = do.call(rbind, lapply(to_edges, disnet_eff_pop1, tau))
     # checks before merging
     # table(rownames(verts) == verts$name)
     # table(rownames(verts) == names(sum_N_ij))
-    verts$sum_N_ij = sum_N_ij
+    verts = merge(verts, sum_N_ij, "name", all.x = TRUE, sort = FALSE)
+    verts$sum_N_ij[ is.na(verts$sum_N_ij) ] = 0
     verts$eff_pop = verts$N_jj + verts$sum_N_ij
     # adding eff pop back to graph
     g = igraph::set_vertex_attr(g, "eff_pop", value = verts$eff_pop)
@@ -29,67 +30,9 @@ disnet_eff_pop = function(g, tau = 3) {
 
 
 disnet_eff_pop1 = function(df, tau) {
+    vert_name = df$to[1]
     N_ij = df$pop_from * ((df$commuting_prop/tau) / (1 + (df$sigma_from/tau)))
-    N_ij = sum(N_ij)
-}
-
-
-
-# older version
-if(FALSE){
-    effective_pop_II = function(i, j, g, tau = 3) {
-        # Populations of neighboring incoming nodes 'i'
-        N_i = vertex_attr(g, "pop", i)
-
-        # Commuting proportion of 'i'
-        sigma_i = vertex_attr(g, "sigma", i)
-
-        # Commuting proportion from 'i' to 'j'
-        sigma_ij = igraph::edge_attr(g, "commuting_prop", paste0(i, "|", j))
-
-        # Second component of formula:
-        N_ij = N_i * ((sigma_ij/tau) / (1 + (sigma_i/tau)))
-        # N_ij = as.data.frame(N_ij)
-        return(N_ij)
-    }
-
-
-
-    effective_pop_I = function(j, g, tau = 3) {
-        print(paste0("Effective population for ", j))
-
-        # Populations of node 'j'
-        N_j = igraph::vertex_attr(g, "pop", j)
-
-        # Commuting proportion of 'j'
-        sigma_j = igraph::vertex_attr(g, "sigma", j)
-
-        # Solve first component of Nj* formula
-        N_jj = N_j / (1 + (sigma_j/tau))
-
-        # Identify neighboring incoming nodes, 'i'
-        i = names(igraph::neighbors(g, j, "in"))
-
-        # Calulate the individual second components of formula,
-        # which are then summed up
-        N_ij = sapply(i, effective_pop_II, j, g)
-        sum_N_ij = sum(N_ij)
-
-        # N_eff_j = Nj*, the effective population
-        N_eff_j = N_jj + sum_N_ij
-        N_eff_j
-    }
-
-
-    effective_pop_fxn = function(g) {
-        j = igraph::vertex_attr(g, "name")
-        eff_pop = lapply(j, effective_pop_I, g)
-        eff_pop = do.call(rbind, eff_pop)
-        eff_pop = round(eff_pop)
-        # Include the eff pop as a vertex attribute in graph
-        g = igraph::set_vertex_attr(g, "eff_pop", value = eff_pop)
-        g
-    }
+    data.frame(name = vert_name, sum_N_ij = sum(N_ij), stringsAsFactors = FALSE)
 }
 
 
