@@ -192,11 +192,11 @@ disnet_comp2_sub = function(j_in){
 # component 2 with I
 # -----------------------------------------------------------------------------
 #'@export
-comp2_i_fxn = function(comp, vI, vIa)#, vname)
-{
-    df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
-    sum(df, na.rm = TRUE)
-}
+# comp2_i_fxn = function(comp, vI, vIa)#, vname)
+# {
+#     df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
+#     sum(df, na.rm = TRUE)
+# }
 
 comp2_i_fxn = function(comp, vI, vIa,
                        idx = if(length(comp) >= 3) comp[[3]] else comp$name) # , vname)
@@ -211,10 +211,14 @@ comp2_i_fxn = function(comp, vI, vIa,
 #'@export
 l_ji_fxn = function(j_out, l_in_node, idx = if(length(j_out) >= 3) j_out[[3]] else j_out$name)
 {
-    local_foi = l_in_node[ idx ] # was j_out$idx  and before that was j_out$name
-              # $sigmaProp_by_tau
-    df = j_out[[2]] * local_foi
-    sum(df, na.rm = TRUE)
+    if(is.null(idx)) {
+        0
+        } else {
+            local_foi = l_in_node[ idx ] # was j_out$idx  and before that was j_out$name
+                 # $sigmaProp_by_tau
+            df = j_out[[2]] * local_foi
+            sum(df, na.rm = TRUE)
+    }
 }
 
 
