@@ -52,7 +52,10 @@ disnet_simulate = function(nsims = 10,
                      j_out = sim_input$j_out,
                      params = sim_input$params,
                      sim_dir = sim_output_dir,
-                     idx = tmp$idx, acomp2_sub = tmp$acomp2_sub, groups = tmp$groups)
+                     idx = NULL,
+                     acomp2_sub = NULL,
+                     groups = NULL
+                     )
     return(sim_res)
 }
 
@@ -83,7 +86,7 @@ if(FALSE)
     vert_list = sim_input$vert_list
     j_out = sim_input$j_out
     params = sim_input$params
-    sim_dir = "data/testres"
+    sim_output_dir = "data/sim-res/test"
     idx = tmp$idx
     acomp2_sub = tmp$acomp2_sub
     groups = tmp$groups

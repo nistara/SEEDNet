@@ -328,7 +328,7 @@ function(comps, names)
 # Simulations ahoy
 # ==============================================================================
 #'@export
-disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub, groups){
+disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub = NULL, groups = NULL){
     # browser()
     TS = vector("list", nsteps)
     TS_sum = matrix(NA, nrow = nsteps, ncol = 5)
@@ -339,16 +339,16 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     cat("-------------------------------------------------------\n")
     cat("******** Simulation ", sim, "\n")
 
-    old = FALSE# TRUE
+    old = TRUE
     # Lift this computation out to disnet_simulate() and then pass in these as parameters/arguments. No need for rowIds or comp2_sub
-if(!old && is.null(idx)) {      # missing(idx)
-  browser()
-    comp2_sub = vert_list[[3]]
-    rowIds = unlist(lapply(comp2_sub, `[[`, 1))   # doesn't get used after this computation.
-    groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
-    acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
-    idx = match(rowIds, vert_list[[1]]$name)    
-}
+    if(!old && is.null(idx)) {      # missing(idx)
+        browser()
+        comp2_sub = vert_list[[3]]
+        rowIds = unlist(lapply(comp2_sub, `[[`, 1))   # doesn't get used after this computation.
+        groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+        acomp2_sub = unlist(lapply(comp2_sub, `[[`, 2))
+        idx = match(rowIds, vert_list[[1]]$name)    
+    }
 
     if(!old) {
         ##XX for each of the data frames in vert_list[[3]] and also j_out, take their names
@@ -405,18 +405,19 @@ if(!old && is.null(idx)) {      # missing(idx)
         TS[[i]] = new_TS
         TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
         prev_TS = new_TS
-        
-        if(length(sim_dir) > 0 && !is.na(sim_dir)) {
-            
-            f = file.path(sim_dir, sprintf("%d%s.RDS", sim, c("", "_info")))
-            saveRDS(TS, f[1])
-            saveRDS(TS_sum, f[2])
-            f
-        } else {
-            list(timeStep = TS, info = TS_sum)
-        }
-        
     }
+    
+    
+    if(length(sim_dir) > 0 && !is.na(sim_dir)) {
+        
+        f = file.path(sim_dir, sprintf("%d%s.RDS", sim, c("", "_info")))
+        saveRDS(TS, f[1])
+        saveRDS(TS_sum, f[2])
+        f
+    } else {
+        list(timeStep = TS, info = TS_sum)
+    }
+    
 }
 
 
