@@ -350,11 +350,14 @@ if(!old && is.null(idx)) {      # missing(idx)
     idx = match(rowIds, vert_list[[1]]$name)    
 }
 
-    ##XX for each of the data frames in vert_list[[3]] and also j_out, take their names
-    # and match them to vert_list[[1]]$name and store in $idx in each data frame
-    #?? Assuming these indices don't change over the simulation.
-    vert_list[[3]] = addIndices(vert_list[[3]], vert_list[[1]]$name)
-    j_out = addIndices(j_out, vert_list[[1]]$name)
+    if(!old) {
+        ##XX for each of the data frames in vert_list[[3]] and also j_out, take their names
+        # and match them to vert_list[[1]]$name and store in $idx in each data frame
+        #?? Assuming these indices don't change over the simulation.
+        vert_list[[3]] = addIndices(vert_list[[3]], vert_list[[1]]$name)
+        j_out = addIndices(j_out, vert_list[[1]]$name)
+    }
+    
     
     for(i in 1:nsteps){
         cat("\r\t\t\tTimestep: ", i, "/", nsteps, sep = "")
@@ -392,24 +395,32 @@ if(!old && is.null(idx)) {      # missing(idx)
             break
         }
 
-if(!old)        
-    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups, old = FALSE)
-else        
-    new_TS$foi = disnet_foi(new_TS, vert_list, j_out, old = TRUE)
+        if(!old) {       
+            new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups, old = FALSE)
+        } else {       
+            new_TS$foi = disnet_foi(new_TS, vert_list, j_out, old = TRUE)
+        }
+        
         
         TS[[i]] = new_TS
         TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
         prev_TS = new_TS
-    }
-    if(length(sim_dir) > 0 && !is.na(sim_dir)) {
         
-        f = file.path(sim_dir, sprintf("%d%s.RDS", sim, c("", "_info")))
-        saveRDS(TS, f[1])
-        saveRDS(TS_sum, f[2])
-        f
-    } else
-        list(timeStep = TS, info = TS_sum)
+        if(length(sim_dir) > 0 && !is.na(sim_dir)) {
+            
+            f = file.path(sim_dir, sprintf("%d%s.RDS", sim, c("", "_info")))
+            saveRDS(TS, f[1])
+            saveRDS(TS_sum, f[2])
+            f
+        } else {
+            list(timeStep = TS, info = TS_sum)
+        }
+        
+    }
 }
+
+
+
 
 
 
