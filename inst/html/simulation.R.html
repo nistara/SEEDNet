@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-1.51 in css mode. -->
+<html>
+  <head>
+    <title>simulation.R</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #121212;
+        background-color: #ffffff;
+      }
+      .bold {
+        /* bold */
+        font-weight: bold;
+      }
+      .comment {
+        /* font-lock-comment-face */
+        color: #4a708b;
+      }
+      .comment-delimiter {
+        /* font-lock-comment-delimiter-face */
+        color: #4a708b;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #a020f0;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #a020f0;
+      }
+      .string {
+        /* font-lock-string-face */
+        color: #8b2252;
+      }
+      .type {
+        /* font-lock-type-face */
+        color: #228b22;
+      }
+      .variable-name {
+        /* font-lock-variable-name-face */
+        color: #a0522d;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Main simulation function
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> This function wraps up all simulation sub-functins and applies them to
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> the intermediate sim files (created by `disnet_sim_setup`
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">nsims</span></span><span class="comment"> The number of simulations to run. Default is 10
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">nsteps</span></span><span class="comment"> The number of timesteps you'd like each simulation to run
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> for. Default = 1000. It's set to a large value so that outbreaks can
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> run their course.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">sim_input</span></span><span class="comment"> The file setup/created by disnet_sim_setup, which has
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> incorprated the foi, infection seeding, and/or vaccination campaign.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">sim_output_dir</span></span><span class="comment"> The directory you'd like to save the simulation results to.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword">@examples</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> f = system.file("sampleData", "g.rds", package = "disnet")
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> g = readRDS(f)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> g_comm = disnet_commuting(g)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> nodes = igraph::vcount(g_comm)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> set.seed(890)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> seed_nd = igraph::vertex_attr(g_comm, "name", sample(1:nodes, 1))
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> for_sim = disnet_sim_setup(g_comm, seed_nd = seed_nd, output_dir = NA)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> simres = disnet_simulate(sim_input = for_sim)
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>
+disnet_simulate = <span class="keyword">function</span>(nsims = 10,
+                   nsteps = 1000,
+                   sim_input = sim_intermed,
+                   sim_output_dir = getOption(<span class="string">"disnetOutputDir"</span>, <span class="type">NA</span>))
+{
+    <span class="comment-delimiter"># </span><span class="comment">create directory to store results in
+</span>    <span class="keyword">if</span>(!is.na(sim_output_dir) &amp;&amp; !dir.exists(sim_output_dir)) {
+        dir.create(sim_output_dir)
+    }
+    <span class="comment-delimiter"># </span><span class="comment">start simulation message
+</span>    <span class="keyword">message</span>(<span class="string">"\nStarting simulations\n"</span>)
+    <span class="comment-delimiter"># </span><span class="comment">set seed to ensure replicability
+</span><span class="comment-delimiter"># </span><span class="comment">Clark: Let the user set the seed before they call this function.
+</span>    set.seed(0)
+    <span class="comment-delimiter"># </span><span class="comment">simulations
+</span>
+    tmp = getIdxAcomp2Groups(sim_input$vert_list)
+    sim_res = lapply(1:nsims, disnet_sim_lapply,
+                     nsteps,
+                     start_TS = sim_input$start_TS,
+                     vert_list = sim_input$vert_list,
+                     j_out = sim_input$j_out,
+                     params = sim_input$params,
+                     sim_dir = sim_output_dir,
+                     idx = <span class="type">NULL</span>,
+                     acomp2_sub = <span class="type">NULL</span>,
+                     groups = <span class="type">NULL</span>
+                     )
+    <span class="keyword">return</span>(sim_res)
+}
+
+
+
+getIdxAcomp2Groups =
+<span class="keyword">function</span>(vert_list)
+{
+    comp2_sub = vert_list[[3]]
+    comp2_sub_l = do.call(rbind, lapply(comp2_sub, length))
+    comp2_sub[ comp2_sub_l %<span class="keyword">in</span>% 0 ] = list(data.frame(name = <span class="type">NA</span>, comp2_sub = 0))
+    
+    rowIds = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 1))   <span class="comment-delimiter"># </span><span class="comment">doesn't get used after this computation.
+</span>    groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+    acomp2_sub = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 2))
+    idx = match(rowIds, vert_list[[1]]$name)
+    list(idx = idx, acomp2_sub = acomp2_sub, groups = groups)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">*** For testing simulations
+</span><span class="keyword">if</span>(<span class="type">FALSE</span>)
+{
+
+    sim = 1
+    nsteps = 10
+    start_TS = sim_input$start_TS
+    vert_list = sim_input$vert_list
+    j_out = sim_input$j_out
+    params = sim_input$params
+    sim_output_dir = <span class="string">"data/sim-res/test"</span>
+    idx = tmp$idx
+    acomp2_sub = tmp$acomp2_sub
+    groups = tmp$groups
+
+}
+
+
+</pre>
+  </body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-1.51 in css mode. -->
+<html>
+  <head>
+    <title>simulation-fxns.R</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #121212;
+        background-color: #ffffff;
+      }
+      .bold {
+        /* bold */
+        font-weight: bold;
+      }
+      .comment {
+        /* font-lock-comment-face */
+        color: #4a708b;
+      }
+      .comment-delimiter {
+        /* font-lock-comment-delimiter-face */
+        color: #4a708b;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #a020f0;
+      }
+      .string {
+        /* font-lock-string-face */
+        color: #8b2252;
+      }
+      .type {
+        /* font-lock-type-face */
+        color: #228b22;
+      }
+      .variable-name {
+        /* font-lock-variable-name-face */
+        color: #a0522d;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Effective population
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"># </span><span class="comment">Based on the formula written for simplified model (on green page)
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_eff_pop = <span class="keyword">function</span>(g, tau = 3) {
+    verts = igraph::as_data_frame(g, <span class="string">"vertices"</span>)
+    edges = igraph::as_data_frame(g, <span class="string">"edges"</span>)
+    <span class="comment-delimiter"># </span><span class="comment">first component of effective pop (N_jj)
+</span>    verts$N_jj = verts$pop/(1 + (verts$sigma/tau))
+    <span class="comment-delimiter"># </span><span class="comment">second component of effective pop (sum N_ij)
+</span>    edges$sigma_from = dplyr::inner_join(edges, verts[ , c(<span class="string">"name"</span>, <span class="string">"sigma"</span>)],
+                                         by = c(<span class="string">"from"</span> = <span class="string">"name"</span>))[[<span class="string">"sigma"</span>]]
+    <span class="comment-delimiter"># </span><span class="comment">split edges by receipient 
+</span>    to_edges = split(edges, as.numeric(edges$to))
+    sum_N_ij = do.call(rbind, lapply(to_edges, disnet_eff_pop1, tau))
+    <span class="comment-delimiter"># </span><span class="comment">checks before merging
+</span>    <span class="comment-delimiter"># </span><span class="comment">table(rownames(verts) == verts$name)
+</span>    <span class="comment-delimiter"># </span><span class="comment">table(rownames(verts) == names(sum_N_ij))
+</span>    verts = merge(verts, sum_N_ij, <span class="string">"name"</span>, all.x = <span class="type">TRUE</span>, sort = <span class="type">FALSE</span>)
+    verts$sum_N_ij[ is.na(verts$sum_N_ij) ] = 0
+    verts$eff_pop = verts$N_jj + verts$sum_N_ij
+    <span class="comment-delimiter"># </span><span class="comment">adding eff pop back to graph
+</span>    g = igraph::set_vertex_attr(g, <span class="string">"eff_pop"</span>, value = verts$eff_pop)
+    <span class="keyword">return</span>(g)
+}
+
+
+disnet_eff_pop1 = <span class="keyword">function</span>(df, tau) {
+    vert_name = df$to[1]
+    N_ij = df$pop_from * ((df$commuting_prop/tau) / (1 + (df$sigma_from/tau)))
+    data.frame(name = vert_name, sum_N_ij = sum(N_ij), stringsAsFactors = <span class="type">FALSE</span>)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Add sigma and sigmaProp_by_tau
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_add_sigmas = <span class="keyword">function</span>(g, tau){
+    <span class="comment-delimiter"># </span><span class="comment">calculate sigma_by_tau and sigmaProp_by_tau
+</span>    sigma_by_tau = igraph::vertex_attr(g, <span class="string">"sigma"</span>)/tau
+    sigmaProp_by_tau = igraph::edge_attr(g, <span class="string">"commuting_prop"</span>)/tau
+
+    <span class="comment-delimiter"># </span><span class="comment">add the two as vertex and edge attribute respectively
+</span>    g = igraph::set_vertex_attr(g, <span class="string">"sigma_by_tau"</span>, value = sigma_by_tau)
+    g = igraph::set_edge_attr(g, <span class="string">"sigmaProp_by_tau"</span>, value = sigmaProp_by_tau)
+    <span class="keyword">return</span>(g)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Initializing start_TS dataframe
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_start_TS = <span class="keyword">function</span>(g){
+    verts = igraph::as_data_frame(g, <span class="string">"vertices"</span>)
+    S = round(igraph::vertex_attr(g, <span class="string">"pop"</span>))
+    start_TS = data.frame(name = verts$name,
+                          S = S,
+                          E = 0,
+                          I = 0,
+                          Ia = 0,
+                          R = 0,
+                          stringsAsFactors = <span class="type">FALSE</span>)
+    <span class="keyword">return</span>(start_TS)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Seed node function
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_seed_nd = <span class="keyword">function</span>(df, nd, inf){
+    seed_row = which(df$name %<span class="keyword">in</span>% nd)
+    df[seed_row, c(<span class="string">"S"</span>, <span class="string">"I"</span>)] = c(df$S[seed_row] -  inf, inf)
+    <span class="keyword">return</span>(df)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">FOI Take II!
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_vert_info = <span class="keyword">function</span>(g, beta){
+    df = igraph::as_data_frame(g, <span class="string">"vertices"</span>)
+    df = df[  , c(<span class="string">"name"</span>, <span class="string">"eff_pop"</span>, <span class="string">"sigma_by_tau"</span>)]
+    df$b_by_n = beta/df$eff_pop
+    df$sigma_by_tau_p1 = df$sigma_by_tau + 1
+    <span class="keyword">return</span>(df)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">net_neighbors_fxn
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"># </span><span class="comment">Gets neighbor info specific to whether the edge is incoming or outgoing
+</span><span class="comment-delimiter">#      </span><span class="comment">i.e.  2 neighbor modes: "in" or "out"
+</span><span class="comment-delimiter"># </span><span class="comment">
+</span><span class="comment-delimiter"># </span><span class="comment">I. For incoming edges, it provides:
+</span><span class="comment-delimiter">#    </span><span class="comment">-------------------------------
+</span><span class="comment-delimiter">#      </span><span class="comment">1. name of neighbors commuting to node
+</span><span class="comment-delimiter">#      </span><span class="comment">2. sigma_by_tau_p1: sigma_by_tau + 1
+</span><span class="comment-delimiter">#      </span><span class="comment">3. sigmaProp_by_tau: proportion of neighbor pop commuting to node
+</span><span class="comment-delimiter">#</span><span class="comment">
+</span><span class="comment-delimiter"># </span><span class="comment">II. For outgoing edges, it provides:
+</span><span class="comment-delimiter">#     </span><span class="comment">-------------------------------
+</span><span class="comment-delimiter">#      </span><span class="comment">1. name of neighbors to which node is commuting to
+</span><span class="comment-delimiter">#      </span><span class="comment">2. sigmaProp_by_tau: proportion of node pop commuting to neighbor
+</span><span class="comment-delimiter">#</span><span class="comment">
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>net_neighbors_fxn = <span class="keyword">function</span>(vert, g, m, vert_info){
+    neigh_name = names(igraph::neighbors(graph = g, v = vert, mode = m))
+    <span class="keyword">if</span>(length(neigh_name) != 0){
+        <span class="keyword">if</span>(m == <span class="string">"in"</span>){
+            from = neigh_name
+            to = vert
+            sigma_by_tau_p1 = vert_info$sigma_by_tau_p1[
+                                  vert_info$name %<span class="keyword">in</span>% neigh_name ]
+            sigmaProp_by_tau = igraph::edge_attr(g, <span class="string">"sigmaProp_by_tau"</span>,
+                                                 paste0(from, <span class="string">"|"</span>, to))
+            df = data.frame(name = neigh_name,
+                            sigma_by_tau_p1 = sigma_by_tau_p1,
+                            sigmaProp_by_tau = sigmaProp_by_tau,
+                            stringsAsFactors = <span class="type">FALSE</span>)
+        } <span class="keyword">else</span> {
+            from = vert
+            to = neigh_name
+            sigmaProp_by_tau = igraph::edge_attr(g, <span class="string">"sigmaProp_by_tau"</span>,
+                                                 paste0(from, <span class="string">"|"</span>, to))
+            df = data.frame(name = neigh_name,
+                            sigmaProp_by_tau = sigmaProp_by_tau,
+                            stringsAsFactors = <span class="type">FALSE</span>)
+        }   
+    } <span class="keyword">else</span> {
+        df = data.frame(<span class="type">NULL</span>)
+    }
+    <span class="keyword">return</span>(df)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">j_in function (wraps up the net_neighbors_fxn for incoming edges)
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_j_in = <span class="keyword">function</span>(vert_info, g){
+    j = vert_info$name
+    j_in = lapply(setNames(j, j), net_neighbors_fxn, g, m = <span class="string">"in"</span>, vert_info)
+    <span class="keyword">return</span>(j_in)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">j_out function (wraps up the net_neighbors_fxn for outgoing edges)
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_j_out = <span class="keyword">function</span>(vert_info, g){
+    j = vert_info$name
+    j_out = lapply(setNames(j, j), net_neighbors_fxn, g, m = <span class="string">"out"</span>, vert_info)
+    <span class="keyword">return</span>(j_out)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">component 2 sub (minus I)
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_comp2_sub = <span class="keyword">function</span>(j_in){
+    <span class="keyword">if</span>(length(j_in) != 0){
+        name = j_in$name
+        comp2_sub = j_in$sigmaProp_by_tau/j_in$sigma_by_tau_p1
+        df = data.frame(name = name,
+                        comp2_sub = comp2_sub,
+                        stringsAsFactors = <span class="type">FALSE</span>)
+    } <span class="keyword">else</span> {
+        df = data.frame(<span class="type">NULL</span>)
+    }
+    
+    <span class="keyword">return</span>(df)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">component 2 with I
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span><span class="comment-delimiter"># </span><span class="comment">comp2_i_fxn = function(comp, vI, vIa)#, vname)
+</span><span class="comment-delimiter"># </span><span class="comment">{
+</span><span class="comment-delimiter">#     </span><span class="comment">df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
+</span><span class="comment-delimiter">#     </span><span class="comment">sum(df, na.rm = TRUE)
+</span><span class="comment-delimiter"># </span><span class="comment">}
+</span>
+comp2_i_fxn = <span class="keyword">function</span>(comp, vI, vIa,
+                       idx = <span class="keyword">if</span>(length(comp) &gt;= 3) comp[[3]] <span class="keyword">else</span> comp$name) <span class="comment-delimiter"># </span><span class="comment">, vname)
+</span>{
+    df = (vI[idx] + vIa[idx]) * comp$comp2_sub
+    sum(df, na.rm = <span class="type">TRUE</span>)
+}
+
+
+<span class="comment-delimiter"># </span><span class="comment">calculate l_ji part
+</span><span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>l_ji_fxn = <span class="keyword">function</span>(j_out, l_in_node, idx = <span class="keyword">if</span>(length(j_out) &gt;= 3) j_out[[3]] <span class="keyword">else</span> j_out$name)
+{
+    <span class="keyword">if</span>(is.null(idx)) {
+        0
+        } <span class="keyword">else</span> {
+            local_foi = l_in_node[ idx ] <span class="comment-delimiter"># </span><span class="comment">was j_out$idx  and before that was j_out$name
+</span>                 <span class="comment-delimiter"># </span><span class="comment">$sigmaProp_by_tau
+</span>            df = j_out[[2]] * local_foi
+            sum(df, na.rm = <span class="type">TRUE</span>)
+    }
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">FOI
+</span><span class="comment-delimiter"># </span><span class="comment">------------------------------------------------------------------------------
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_foi = <span class="keyword">function</span>(df_TS, vert_list, j_out, idx = <span class="type">NULL</span>, acomp2_sub = <span class="type">NULL</span>, groups = <span class="type">NULL</span>, r_beta = 0.50, old = <span class="type">TRUE</span>){
+
+    <span class="comment-delimiter"># </span><span class="comment">vert_list doesn't change across calls.
+</span>    vert_info = vert_list[[1]] <span class="comment-delimiter"># </span><span class="comment">vert_info
+</span>    comp1_sub = vert_list[[2]] <span class="comment-delimiter"># </span><span class="comment">comp1_sub
+</span><span class="comment-delimiter">#</span><span class="comment">Not needed if idx, acomp2_sub and groups provided.    
+</span>    comp2_sub = vert_list[[3]] <span class="comment-delimiter"># </span><span class="comment">comp2_sub
+</span>
+<span class="keyword">if</span>(!old) {    
+    <span class="keyword">if</span>(is.null(acomp2_sub)) 
+        acomp2_sub = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 2))
+    <span class="keyword">if</span>(is.null(idx)) {
+        rowIds = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 1))
+        idx = match(rowIds, vert_info$name)    
+    }
+    <span class="keyword">if</span>(is.null(groups)) {
+        groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+    }
+}
+    
+    <span class="comment-delimiter">#</span><span class="comment">!! These change across calls.
+</span>    I = df_TS[[4]] <span class="comment-delimiter"># </span><span class="comment">$I 
+</span>    Ia = df_TS[[5]] * r_beta <span class="comment-delimiter"># </span><span class="comment">$Ia * r_beta 
+</span>
+    <span class="comment-delimiter">#</span><span class="comment">$I       #$Ia * r_beta
+</span>    comp1_i = (I + Ia) * comp1_sub
+
+    <span class="comment-delimiter"># </span><span class="comment">comp2_sub doesn't change across. vert_info[[6]] and [[7]] do.
+</span>    <span class="comment-delimiter">#    </span><span class="comment">doCompSum(comp2_sub, vert_info[[6]], vert_info[[7]])
+</span><span class="keyword">if</span>(!old)   {
+    tmp = (I[idx] + Ia[idx])*acomp2_sub
+    <span class="comment-delimiter">#    </span><span class="comment">comp2_i = sapply(split(tmp, groups), sum)
+</span>    comp2_i = tapply(tmp, groups, sum)    
+} <span class="keyword">else</span>    
+    comp2_i = sapply(comp2_sub, comp2_i_fxn,
+                     structure(I, names = vert_info$name),  <span class="comment-delimiter"># </span><span class="comment">$I
+</span>                     structure(Ia, names = vert_info$name)) <span class="comment-delimiter">#</span><span class="comment">$Ia
+</span>
+    <span class="comment-delimiter"># </span><span class="comment">onwards to FOI
+</span>    <span class="comment-delimiter"># </span><span class="comment">$b_by_n 
+</span>    l_in_node_val = (vert_info[[4]] * (comp1_i + comp2_i))/vert_info[[5]] <span class="comment-delimiter"># </span><span class="comment">$sigma_by_tau_p1
+</span>
+    l_ji  = sapply(j_out, l_ji_fxn, l_in_node_val)
+
+    <span class="comment-delimiter"># </span><span class="comment">foi
+</span>    l_in_node_val + l_ji
+}
+
+<span class="comment-delimiter"># </span><span class="comment"># Testing that the empty dfs are the same for both comp and j_in
+</span><span class="comment-delimiter"># </span><span class="comment">l = lfun(comp2_i)
+</span>
+<span class="comment-delimiter"># </span><span class="comment">lfun = function(x) {
+</span><span class="comment-delimiter">#     </span><span class="comment">df = lapply(x, length)
+</span><span class="comment-delimiter">#     </span><span class="comment">df = do.call(rbind, df)
+</span><span class="comment-delimiter">#     </span><span class="comment">return(df)
+</span><span class="comment-delimiter"># </span><span class="comment">}
+</span>
+<span class="comment-delimiter"># </span><span class="comment">l_j_in = lfun(j_in)
+</span><span class="comment-delimiter"># </span><span class="comment">which(l_j_in == 0) == which(l == 0)
+</span>
+
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Functions to transition between SEIR compartments
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>S_to_E = <span class="keyword">function</span>(S, p)
+    rbinom(n = 1, size = S, prob = p)
+
+
+E_to_I = <span class="keyword">function</span>(E, p)
+    rbinom(n = 1, size = E, prob = p)
+
+
+I_to_R = <span class="keyword">function</span>(I, p)
+    rbinom(n = 1, size = I, prob = p)
+
+<span class="comment-delimiter"># </span><span class="comment">For transitioning to Inf or asymptomatic infectious, use rmultinom (to
+</span><span class="comment-delimiter"># </span><span class="comment">draw from a multinomial distribution
+</span><span class="comment-delimiter"># </span><span class="comment">e.g
+</span><span class="comment-delimiter"># </span><span class="comment">mapply(rmultinom,size = c(3, 7, 3, 5, 6, 1, 2),
+</span><span class="comment-delimiter"># </span><span class="comment">MoreArgs = list(n = 1, prob = c(0.2, 0.8)))
+</span>
+<span class="comment-delimiter"># </span><span class="comment">If I don't use MoreArgs like above, I'll get an error. E.g.:
+</span><span class="comment-delimiter"># </span><span class="comment">&gt; mapply(rmultinom,size = c(3, 7, 3, 5, 6, 1, 2), n = 1, prob = c(0.2, 0.8))
+</span><span class="comment-delimiter"># </span><span class="comment">[1] 3 7 3 5 6 1 2
+</span><span class="comment-delimiter"># </span><span class="comment">Warning message:
+</span><span class="comment-delimiter"># </span><span class="comment">In mapply(rmultinom, size = c(3, 7, 3, 5, 6, 1, 2), n = 1, prob = c(0.2,  :
+</span><span class="comment-delimiter"># </span><span class="comment">longer argument not a multiple of length of shorter
+</span>
+
+addIndices =
+<span class="keyword">function</span>(comps, names)
+{
+  lapply(comps, <span class="keyword">function</span>(x) { x$idx = match(x$name, names) ; x})
+}
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">Simulations ahoy
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>disnet_sim_lapply = <span class="keyword">function</span>(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = <span class="type">NULL</span>, acomp2_sub = <span class="type">NULL</span>, groups = <span class="type">NULL</span>){
+    <span class="comment-delimiter"># </span><span class="comment">browser()
+</span>    TS = vector(<span class="string">"list"</span>, nsteps)
+    TS_sum = matrix(<span class="type">NA</span>, nrow = nsteps, ncol = 5)
+    colnames(TS_sum) = c(<span class="string">"S"</span>, <span class="string">"E"</span>, <span class="string">"I"</span>, <span class="string">"Ia"</span>, <span class="string">"R"</span>)
+    prev_TS = start_TS
+    n = nrow(prev_TS)    
+
+    cat(<span class="string">"-------------------------------------------------------\n"</span>)
+    cat(<span class="string">"******** Simulation "</span>, sim, <span class="string">"\n"</span>)
+
+    old = <span class="type">TRUE</span>
+    <span class="comment-delimiter"># </span><span class="comment">Lift this computation out to disnet_simulate() and then pass in these as parameters/arguments. No need for rowIds or comp2_sub
+</span>    <span class="keyword">if</span>(!old &amp;&amp; is.null(idx)) {      <span class="comment-delimiter"># </span><span class="comment">missing(idx)
+</span>        browser()
+        comp2_sub = vert_list[[3]]
+        rowIds = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 1))   <span class="comment-delimiter"># </span><span class="comment">doesn't get used after this computation.
+</span>        groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
+        acomp2_sub = unlist(lapply(comp2_sub, <span class="string">`[[`</span>, 2))
+        idx = match(rowIds, vert_list[[1]]$name)    
+    }
+
+    <span class="keyword">if</span>(!old) {
+        <span class="comment-delimiter">##</span><span class="comment">XX for each of the data frames in vert_list[[3]] and also j_out, take their names
+</span>        <span class="comment-delimiter"># </span><span class="comment">and match them to vert_list[[1]]$name and store in $idx in each data frame
+</span>        <span class="comment-delimiter">#</span><span class="comment">?? Assuming these indices don't change over the simulation.
+</span>        vert_list[[3]] = addIndices(vert_list[[3]], vert_list[[1]]$name)
+        j_out = addIndices(j_out, vert_list[[1]]$name)
+    }
+    
+    
+    <span class="keyword">for</span>(i <span class="keyword">in</span> 1:nsteps){
+        <span class="comment-delimiter"># </span><span class="comment">browser()
+</span>        cat(<span class="string">"\r\t\t\tTimestep: "</span>, i, <span class="string">"/"</span>, nsteps, sep = <span class="string">""</span>)
+        
+        E = rbinom(n, prev_TS$S, prev_TS$foi)
+        exit_E = mapply(rmultinom, size = prev_TS$E,
+                        MoreArgs = list(n = 1,
+                                        prob = c(params$exit_latent_I,
+                                                 params$exit_latent_Ia)))
+        I = exit_E[1, ]
+        Ia = exit_E[2, ]
+        R_I = rbinom(n, prev_TS$I, params$mu)
+        R_Ia = rbinom(n, prev_TS$Ia, params$mu)        
+
+        new_S = prev_TS$S - E
+        new_E = prev_TS$E + E - (I + Ia)
+        new_I = prev_TS$I + I - R_I
+        new_Ia = prev_TS$Ia + Ia - R_Ia
+        new_R = prev_TS$R + R_I + R_Ia
+
+        new_TS = data.frame(name = prev_TS$name,
+                            S = new_S,
+                            E = new_E,
+                            I = new_I,
+                            Ia = new_Ia,
+                            R = new_R,
+                            stringsAsFactors = <span class="type">FALSE</span>)
+
+
+        <span class="keyword">if</span>((sum(new_E) + sum(new_I) + sum(new_Ia)) == 0){
+            TS[[i]] = new_TS
+            TS[(i + 1):nsteps] = <span class="type">NULL</span>
+            TS_sum[i, ] = colSums(new_TS[ , -c(1)])
+            TS_sum = TS_sum[ -((i + 1):nsteps), ]
+            <span class="keyword">break</span>
+        }
+
+        <span class="keyword">if</span>(!old) {       
+            new_TS$foi = disnet_foi(new_TS, vert_list, j_out, idx, acomp2_sub, groups, old = <span class="type">FALSE</span>)
+        } <span class="keyword">else</span> {       
+            new_TS$foi = disnet_foi(new_TS, vert_list, j_out, old = <span class="type">TRUE</span>)
+        }
+        
+        
+        TS[[i]] = new_TS
+        TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
+        prev_TS = new_TS
+        
+    }
+    
+    
+    <span class="keyword">if</span>(length(sim_dir) &gt; 0 &amp;&amp; !is.na(sim_dir)) {
+        
+        f = file.path(sim_dir, sprintf(<span class="string">"%d%s.RDS"</span>, sim, c(<span class="string">""</span>, <span class="string">"_info"</span>)))
+        saveRDS(TS, f[1])
+        saveRDS(TS_sum, f[2])
+        f
+    } <span class="keyword">else</span> {
+        list(timeStep = TS, info = TS_sum)
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+  </body>
+</html>

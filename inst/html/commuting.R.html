@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!-- Created by htmlize-1.51 in css mode. -->
+<html>
+  <head>
+    <title>commuting.R</title>
+    <style type="text/css">
+    <!--
+      body {
+        color: #121212;
+        background-color: #ffffff;
+      }
+      .bold {
+        /* bold */
+        font-weight: bold;
+      }
+      .comment {
+        /* font-lock-comment-face */
+        color: #4a708b;
+      }
+      .comment-delimiter {
+        /* font-lock-comment-delimiter-face */
+        color: #4a708b;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #a020f0;
+      }
+      .keyword {
+        /* font-lock-keyword-face */
+        color: #a020f0;
+      }
+      .string {
+        /* font-lock-string-face */
+        color: #8b2252;
+      }
+      .type {
+        /* font-lock-type-face */
+        color: #228b22;
+      }
+      .variable-name {
+        /* font-lock-variable-name-face */
+        color: #a0522d;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <pre>
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span><span class="comment-delimiter"># </span><span class="comment">This code calculates the commuting rates between nodes in the graph
+</span><span class="comment-delimiter">#</span><span class="comment">
+</span><span class="comment-delimiter"># </span><span class="comment">There are 1606 nodes, and 2577630 edges (after removing the self edges:
+</span><span class="comment-delimiter">#      </span><span class="comment">(1606 * 1606) - 1606 = 2577630
+</span><span class="comment-delimiter">#      </span><span class="comment">NOTE: they go from 0-1605, not 1-1606
+</span><span class="comment-delimiter">#            </span><span class="comment">the matrix is arranged from smallest distance to largest one
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+
+<span class="comment-delimiter"># </span><span class="comment">Functions for commuting rate (removing nodes with &lt; 10 people)
+</span><span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Commuting function
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> `disnet_commuting` gets the `from` nodes, and sends them as the parameter for
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> the disnet_comm2 along with the entire dataframe `nd_edges`.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> It incoporates both the individual and all nodes' functions.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Note: it removes nodes with less than 10 people in them. 
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">g</span></span><span class="comment"> The `graphml` (network) object for which to calculate commuting rates
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword">@examples</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> f = system.file("sampleData", "g.rds", package = "disnet")
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> g = readRDS(f)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> disnet_commuting(g)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>
+disnet_commuting = <span class="keyword">function</span>(g)
+{
+    comm_info = disnet_comm3(g)
+    g_edges = comm_info$g_edges
+    i = unique(g_edges$from)
+    cr = lapply(i, disnet_comm2, g_edges)
+    g_edges$commuting_prop = do.call(rbind, cr)
+
+    verts_info = comm_info$g_verts
+
+    <span class="comment-delimiter"># </span><span class="comment">Calculating Sigma (total commuting prop for each node
+</span>    verts_info$sigma = aggregate(commuting_prop ~ as.numeric(g_edges$from),
+                                 data = g_edges, FUN = sum)[[<span class="string">"V1"</span>]]
+
+    <span class="comment-delimiter"># </span><span class="comment">rounding commuting proportion to 2 decimal places
+</span>    verts_info$sigma = round(verts_info$sigma, 2)
+
+    <span class="comment-delimiter">## </span><span class="comment">Create graph file
+</span>    g_comm = igraph::graph_from_data_frame(g_edges,
+                                           directed = <span class="type">TRUE</span>,
+                                           vertices = verts_info)
+
+    <span class="keyword">if</span>(<span class="type">FALSE</span>){
+        <span class="comment-delimiter"># </span><span class="comment">Check that the info is correct in the created graph:
+</span>        g_edges2 = igraph::as_data_frame(g_comm, what = <span class="string">"both"</span>)
+
+        <span class="comment-delimiter"># </span><span class="comment">Checking Kigali, the largest node, named "890". Its pop match Kigali's
+</span>        g_edges2$vertices[ g_edges2$vertices$name == <span class="string">"890"</span>, ]
+
+        <span class="comment-delimiter"># </span><span class="comment">head and tail, to make sure the names corroborate with the graph vertices
+</span>        head(g_edges2$vertices, 10)
+        tail(g_edges2$vertices, 10)
+        head(g_edges2$edges)
+        head(g_edges)
+
+        <span class="comment-delimiter"># </span><span class="comment">Save the graph
+</span>        write.graph(g_comm, paste0(<span class="string">"data/graphml/"</span>, Sys.Date(), <span class="string">"_graph-commuting.graphml"</span>),
+                    format = <span class="string">"graphml"</span>)
+
+    }
+
+    g_comm
+}
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> disnet_comm1
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> gets commuting rate for each individual node (hence it's for individual nodes)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Considers a commuting proportion of 11% for the entire population
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">i</span></span><span class="comment"> the node for which commuting proportion is being calculated
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">edges_subset</span></span><span class="comment"> subset of `nd_edges` with all outgoing edges of `i`
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">j</span></span><span class="comment"> all the nodes `i` is connected to
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> 
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>
+disnet_comm1 = <span class="keyword">function</span>(j, edges_subset, i) {
+    radius = edges_subset$Total_Length[ edges_subset$to %<span class="keyword">in</span>% j]
+    df_radius = edges_subset[ edges_subset$Total_Length &lt;= radius, ]
+    m_i = df_radius$pop_from[1]
+    n_j = df_radius$pop_to[ df_radius$to %<span class="keyword">in</span>% j]
+    s_ij = sum(df_radius$pop_to[ df_radius$to != j])
+    N_c = 0.11 <span class="comment-delimiter"># </span><span class="comment">using 0.11 as commuting proportion from Simini paper
+</span>    N = 1 <span class="comment-delimiter"># </span><span class="comment">to get 0.11 as proportion
+</span>    T_i = (N_c/N) <span class="comment-delimiter"># </span><span class="comment">want only rate, not num people. original:  m_i * (N_c/N)
+</span>    T_ij = T_i * ( (m_i * n_j) / ((m_i + s_ij) * (m_i + n_j + s_ij)) )
+    T_ij
+}
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> disnet_comm2
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Gets commuting rate for all nodes (includes individual node function)
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">i</span></span><span class="comment"> id of the `from` node, for which we want to calculate commuting
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> proportion
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">test_edges</span></span><span class="comment"> the dataframe of the edges which contains the distances
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> between the nodes and the population of each edges's
+</span><span class="comment-delimiter">#                   </span><span class="comment">`from` and `to nodes.
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>
+disnet_comm2 = <span class="keyword">function</span>(i,test_edges) {
+    edges_subset = test_edges[ test_edges$from %<span class="keyword">in</span>% i, ]
+    all_j = edges_subset$to
+    print(paste0(<span class="string">"working on node: "</span>, i))
+
+    comm_rate = lapply(all_j, disnet_comm1, edges_subset, i)
+    comm_rate = do.call(rbind, comm_rate)
+    <span class="keyword">return</span>(comm_rate)
+}
+
+<span class="comment-delimiter"># </span><span class="comment">==============================================================================
+</span>
+<span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> disnet_comm3
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> Preps the incoming graph for commuting rate calculation
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment">
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="keyword"><span class="keyword">@param</span></span></span><span class="comment"> </span><span class="comment"><span class="variable-name">g</span></span><span class="comment"> graph whose commuting rate needs to be calculated
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> 
+</span><span class="comment-delimiter"><span class="bold">#</span></span><span class="comment"><span class="bold">'</span></span><span class="comment"> </span><span class="comment"><span class="variable-name">@export</span></span><span class="comment">
+</span>
+disnet_comm3 = <span class="keyword">function</span>(g){
+    
+    <span class="comment-delimiter"># </span><span class="comment">Convert graphml object to dataframe for further manipulation
+</span>    df = igraph::as_data_frame(g, what = <span class="string">"both"</span>)
+
+    <span class="comment-delimiter"># </span><span class="comment">Node information
+</span>    g_verts = df$vertices
+
+    <span class="comment-delimiter"># </span><span class="comment">Remove nodes with less than 10 people in them
+</span>    <span class="comment-delimiter"># </span><span class="comment">sum(g_verts$pop &lt; 10)
+</span>    g_verts = g_verts[ !g_verts$pop &lt; 10, ]
+    nodes = unique(g_verts$name)           <span class="comment-delimiter">#</span><span class="comment">unique nodes
+</span>
+    <span class="comment-delimiter"># </span><span class="comment">Edges
+</span>    g_edges = df$edges[ df$edges$from %<span class="keyword">in</span>% nodes &amp; df$edges$to %<span class="keyword">in</span>% nodes, ] 
+
+    <span class="comment-delimiter"># </span><span class="comment">Adding population data to edges
+</span>    <span class="comment-delimiter"># </span><span class="comment">-----------------------------------------------------------------------------
+</span>    pop_from = dplyr::inner_join(g_edges, g_verts, by = c(<span class="string">"from"</span> = <span class="string">"name"</span>))[<span class="string">"pop"</span>]
+    g_edges$pop_from = pop_from$pop
+
+    pop_to = dplyr::inner_join(g_edges, g_verts, by = c(<span class="string">"to"</span> = <span class="string">"name"</span>))[<span class="string">"pop"</span>]
+    g_edges$pop_to = pop_to$pop
+    list(g_verts = g_verts, g_edges = g_edges)
+}
+
+
+
+<span class="comment-delimiter"># </span><span class="comment">*** Take two
+</span>
+disnet_commuting2 = <span class="keyword">function</span>(g)
+{
+    comm_info = disnet_comm3(g)
+    g_edges = comm_info$g_edges
+    verts_info = comm_info$g_verts
+    from = factor(g_edges$from, levels = unique(g_edges$from))
+
+    edges_from = split(g_edges, from)
+
+    edges_from_to = lapply(edges_from, <span class="keyword">function</span>(edges_from)
+    {
+        radii = edges_from$Total_Length
+        lapply(seq_along(radii), <span class="keyword">function</span>(i, df, radis)
+        {
+            df = df[ df$Total_Length &lt;= radii[i], ]
+        }, edges_from, radii)
+    })
+
+    cr = lapply(seq_along(edges_from_to), <span class="keyword">function</span>(i, edges_from_to, edges_from)
+    {
+        df_radius = edges_from_to[[i]]
+        m_i = edges_from[[i]]$pop_from
+        n_j = edges_from[[i]]$pop_to
+        N_c = 0.11 <span class="comment-delimiter"># </span><span class="comment">using 0.11 as commuting proportion from Simini paper
+</span>        N = 1 <span class="comment-delimiter"># </span><span class="comment">to get 0.11 as proportion
+</span>        T_i = (N_c/N) <span class="comment-delimiter"># </span><span class="comment">want only rate, not num people. original:  m_i * (N_c/N)
+</span>        
+        s_ij = do.call(rbind, lapply(df_radius, <span class="keyword">function</span>(df_radius)
+        {
+            sum(df_radius$pop_to) - df_radius$pop_to[1]
+        }))
+
+        T_ij = T_i * ( (m_i * n_j) / ((m_i + s_ij) * (m_i + n_j + s_ij)) )
+        T_ij
+    }, edges_from_to, edges_from)
+    
+
+    g_edges$commuting_prop = do.call(rbind, cr)
+
+
+
+    <span class="comment-delimiter"># </span><span class="comment">Calculating Sigma (total commuting prop for each node
+</span>    verts_info$sigma = aggregate(commuting_prop ~ as.numeric(g_edges$from),
+                                 data = g_edges, FUN = sum)[[<span class="string">"V1"</span>]]
+
+    <span class="comment-delimiter"># </span><span class="comment">rounding commuting proportion to 2 decimal places
+</span>    <span class="comment-delimiter"># </span><span class="comment">verts_info$sigma = round(verts_info$sigma, 2)
+</span>
+    <span class="comment-delimiter">## </span><span class="comment">Create graph file
+</span>    g_comm = igraph::graph_from_data_frame(g_edges,
+                                           directed = <span class="type">TRUE</span>,
+                                           vertices = verts_info)
+
+    <span class="keyword">if</span>(<span class="type">FALSE</span>){
+        <span class="comment-delimiter"># </span><span class="comment">Check that the info is correct in the created graph:
+</span>        g_edges2 = igraph::as_data_frame(g_comm, what = <span class="string">"both"</span>)
+
+        <span class="comment-delimiter"># </span><span class="comment">Checking Kigali, the largest node, named "890". Its pop match Kigali's
+</span>        g_edges2$vertices[ g_edges2$vertices$name == <span class="string">"890"</span>, ]
+
+        <span class="comment-delimiter"># </span><span class="comment">head and tail, to make sure the names corroborate with the graph vertices
+</span>        head(g_edges2$vertices, 10)
+        tail(g_edges2$vertices, 10)
+        head(g_edges2$edges)
+        head(g_edges)
+
+        <span class="comment-delimiter"># </span><span class="comment">Save the graph
+</span>        write.graph(g_comm, paste0(<span class="string">"data/graphml/"</span>, Sys.Date(), <span class="string">"_graph-commuting.graphml"</span>),
+                    format = <span class="string">"graphml"</span>)
+
+    }
+
+    g_comm
+}
+
+
+
+    
+
+    
+
+</pre>
+  </body>
+</html>
