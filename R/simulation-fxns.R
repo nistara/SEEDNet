@@ -20,7 +20,7 @@ disnet_eff_pop = function(g, tau = 3) {
     # checks before merging
     # table(rownames(verts) == verts$name)
     # table(rownames(verts) == names(sum_N_ij))
-    verts = merge(verts, sum_N_ij, "name", all.x = TRUE, sort = FALSE)
+    verts = dplyr::left_join(verts, sum_N_ij, by = "name")
     verts$sum_N_ij[ is.na(verts$sum_N_ij) ] = 0
     verts$eff_pop = verts$N_jj + verts$sum_N_ij
     # adding eff pop back to graph
@@ -30,6 +30,7 @@ disnet_eff_pop = function(g, tau = 3) {
 
 
 disnet_eff_pop1 = function(df, tau) {
+    # browser()
     vert_name = df$to[1]
     N_ij = df$pop_from * ((df$commuting_prop/tau) / (1 + (df$sigma_from/tau)))
     data.frame(name = vert_name, sum_N_ij = sum(N_ij), stringsAsFactors = FALSE)
@@ -198,13 +199,24 @@ disnet_comp2_sub = function(j_in){
 #     sum(df, na.rm = TRUE)
 # }
 
-comp2_i_fxn = function(comp, vI, vIa,
-                       idx = if(length(comp) >= 3) comp[[3]] else comp$name) # , vname)
-{
-    df = (vI[idx] + vIa[idx]) * comp$comp2_sub
-    sum(df, na.rm = TRUE)
-}
+# comp2_i_fxn = function(comp, vI, vIa,
+#                        idx = if(length(comp) >= 3) comp[[3]] else comp$name) # , vname)
+# {
+#     df = (vI[idx] + vIa[idx]) * comp$comp2_sub
+#     sum(df, na.rm = TRUE)
+# }
 
+#'@export
+comp2_i_fxn = function(comp, vI, vIa)#, vname)
+{
+    # browser()
+    if(nrow(comp) > 0) {
+        df = (vI[comp$name] + vIa[comp$name]) * comp$comp2_sub
+        sum(df, na.rm = TRUE)
+    } else {
+        return(0)
+    }
+}
 
 # calculate l_ji part
 # -----------------------------------------------------------------------------
@@ -226,7 +238,9 @@ l_ji_fxn = function(j_out, l_in_node, idx = if(length(j_out) >= 3) j_out[[3]] el
 # FOI
 # ------------------------------------------------------------------------------
 #'@export
-disnet_foi = function(df_TS, vert_list, j_out, idx = NULL, acomp2_sub = NULL, groups = NULL, r_beta = 0.50, old = TRUE){
+disnet_foi = function(start_TS, vert_list, j_out, idx = NULL, acomp2_sub = NULL, groups = NULL, r_beta = 0.50, old = TRUE){
+
+    # browser()
 
     # vert_list doesn't change across calls.
     vert_info = vert_list[[1]] # vert_info
@@ -247,22 +261,23 @@ if(!old) {
 }
     
     #!! These change across calls.
-    I = df_TS[[4]] # $I 
-    Ia = df_TS[[5]] * r_beta # $Ia * r_beta 
+    I = start_TS[[4]] # $I 
+    Ia = start_TS[[5]] * r_beta # $Ia * r_beta 
 
-    #$I       #$Ia * r_beta
     comp1_i = (I + Ia) * comp1_sub
 
     # comp2_sub doesn't change across. vert_info[[6]] and [[7]] do.
     #    doCompSum(comp2_sub, vert_info[[6]], vert_info[[7]])
-if(!old)   {
-    tmp = (I[idx] + Ia[idx])*acomp2_sub
-    #    comp2_i = sapply(split(tmp, groups), sum)
-    comp2_i = tapply(tmp, groups, sum)    
-} else    
-    comp2_i = sapply(comp2_sub, comp2_i_fxn,
-                     structure(I, names = vert_info$name),  # $I
-                     structure(Ia, names = vert_info$name)) #$Ia
+    if(!old)   {
+        tmp = (I[idx] + Ia[idx])*acomp2_sub
+        #    comp2_i = sapply(split(tmp, groups), sum)
+        comp2_i = tapply(tmp, groups, sum)    
+    } else {
+        comp2_i = sapply(comp2_sub, comp2_i_fxn,
+                         structure(I, names = vert_info$name),  # $I
+                         structure(Ia, names = vert_info$name)) #$Ia
+    }
+    
 
     # onwards to FOI
     # $b_by_n 
@@ -330,6 +345,7 @@ function(comps, names)
 #'@export
 disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub = NULL, groups = NULL){
     # browser()
+
     TS = vector("list", nsteps)
     TS_sum = matrix(NA, nrow = nsteps, ncol = 5)
     colnames(TS_sum) = c("S", "E", "I", "Ia", "R")
@@ -342,7 +358,7 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     old = TRUE
     # Lift this computation out to disnet_simulate() and then pass in these as parameters/arguments. No need for rowIds or comp2_sub
     if(!old && is.null(idx)) {      # missing(idx)
-        browser()
+        # browser()
         comp2_sub = vert_list[[3]]
         rowIds = unlist(lapply(comp2_sub, `[[`, 1))   # doesn't get used after this computation.
         groups = rep(1:length(comp2_sub), sapply(comp2_sub, nrow))
@@ -360,6 +376,9 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
     
     
     for(i in 1:nsteps){
+
+        # browser()
+
         cat("\r\t\t\tTimestep: ", i, "/", nsteps, sep = "")
         
         E = rbinom(n, prev_TS$S, prev_TS$foi)
@@ -405,6 +424,7 @@ disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, si
         TS[[i]] = new_TS
         TS_sum[i, ] = colSums(prev_TS[ , -c(1, 7)])
         prev_TS = new_TS
+        
     }
     
     
