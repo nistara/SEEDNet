@@ -12,7 +12,8 @@ disnet_commuting(g)
 \description{
 `disnet_commuting` gets the `from` nodes, and sends them as the parameter for
 the disnet_comm2 along with the entire dataframe `nd_edges`.
-It incoporates both the individual and all nodes' functions
+It incoporates both the individual and all nodes' functions.
+Note: it removes nodes with less than 10 people in them.
 }
 \examples{
 f = system.file("sampleData", "g.rds", package = "disnet")

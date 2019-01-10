@@ -5,7 +5,8 @@
 \title{Main simulation function}
 \usage{
 disnet_simulate(nsims = 10, nsteps = 1000, sim_input = sim_intermed,
-  sim_output_dir = getOption("disnetOutputDir", NA))
+  sim_output_dir = getOption("disnetOutputDir", NA), parallel = FALSE,
+  seed = 0)
 }
 \arguments{
 \item{nsims}{The number of simulations to run. Default is 10}
