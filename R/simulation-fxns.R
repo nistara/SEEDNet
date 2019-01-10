@@ -343,7 +343,7 @@ function(comps, names)
 # Simulations ahoy
 # ==============================================================================
 #'@export
-disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub = NULL, groups = NULL){
+disnet_sim_lapply = function(sim, nsteps, start_TS, vert_list, j_out, params, sim_dir, idx = NULL, acomp2_sub = NULL, groups = NULL, ...){
     # browser()
 
     TS = vector("list", nsteps)
