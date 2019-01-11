@@ -17,4 +17,6 @@ Suggests:
 VignetteBuilder: knitr
 Imports:
 	igraph,
-    	devtools
+    	devtools,
+    future.apply,
+    dplyr
