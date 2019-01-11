@@ -1,3 +1,7 @@
+
+
+[![Build Status](https://travis-ci.com/nistara/disnet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/nistara/disnet)
+
 # disnet
 Compiling the existing code and data into a package for better collaboration.
 
