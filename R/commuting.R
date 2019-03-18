@@ -19,6 +19,8 @@
 #' Note: it removes nodes with less than 10 people in them. 
 #'
 #' @param g The `graphml` (network) object for which to calculate commuting rates
+#' @param N_c The commuting proportion of the entire population. Default = 0.11 from
+#' Simini
 #'
 #' @examples
 #' f = system.file("sampleData", "g.rds", package = "disnet")
@@ -26,12 +28,12 @@
 #' disnet_commuting(g)
 #' @export
 
-disnet_commuting = function(g)
+disnet_commuting = function(g, N_c = 0.11)
 {
     comm_info = disnet_comm3(g)
     g_edges = comm_info$g_edges
     i = unique(g_edges$from)
-    cr = lapply(i, disnet_comm2, g_edges)
+    cr = lapply(i, disnet_comm2, g_edges, N_c)
     g_edges$commuting_prop = do.call(rbind, cr)
 
     verts_info = comm_info$g_verts
@@ -79,16 +81,18 @@ disnet_commuting = function(g)
 #' @param i the node for which commuting proportion is being calculated
 #' @param edges_subset subset of `nd_edges` with all outgoing edges of `i`
 #' @param j all the nodes `i` is connected to
+#' @param N_c The commuting proportion of the entire population. Default = 0.11 from
+#' Simini
 #' 
 #' @export
 
-disnet_comm1 = function(j, edges_subset, i) {
+disnet_comm1 = function(j, edges_subset, i, N_c) {
     radius = edges_subset$Total_Length[ edges_subset$to %in% j]
     df_radius = edges_subset[ edges_subset$Total_Length <= radius, ]
     m_i = df_radius$pop_from[1]
     n_j = df_radius$pop_to[ df_radius$to %in% j]
     s_ij = sum(df_radius$pop_to[ df_radius$to != j])
-    N_c = 0.11 # using 0.11 as commuting proportion from Simini paper
+    # N_c = 0.11 # using 0.11 as commuting proportion from Simini paper
     N = 1 # to get 0.11 as proportion
     T_i = (N_c/N) # want only rate, not num people. original:  m_i * (N_c/N)
     T_ij = T_i * ( (m_i * n_j) / ((m_i + s_ij) * (m_i + n_j + s_ij)) )
@@ -106,14 +110,17 @@ disnet_comm1 = function(j, edges_subset, i) {
 #' @param test_edges the dataframe of the edges which contains the distances
 #' between the nodes and the population of each edges's
 #                   `from` and `to nodes.
+#' @param N_c The commuting proportion of the entire population. Default = 0.11 from
+#' Simini
+#' 
 #' @export
 
-disnet_comm2 = function(i,test_edges) {
+disnet_comm2 = function(i,test_edges, N_c) {
     edges_subset = test_edges[ test_edges$from %in% i, ]
     all_j = edges_subset$to
     print(paste0("working on node: ", i))
 
-    comm_rate = lapply(all_j, disnet_comm1, edges_subset, i)
+    comm_rate = lapply(all_j, disnet_comm1, edges_subset, i, N_c)
     comm_rate = do.call(rbind, comm_rate)
     return(comm_rate)
 }
@@ -158,7 +165,7 @@ disnet_comm3 = function(g){
 
 # *** Take two
 
-disnet_commuting2 = function(g)
+disnet_commuting2 = function(g, N_c = 0.11)
 {
     comm_info = disnet_comm3(g)
     g_edges = comm_info$g_edges
@@ -181,7 +188,7 @@ disnet_commuting2 = function(g)
         df_radius = edges_from_to[[i]]
         m_i = edges_from[[i]]$pop_from
         n_j = edges_from[[i]]$pop_to
-        N_c = 0.11 # using 0.11 as commuting proportion from Simini paper
+        # N_c = 0.11 # using 0.11 as commuting proportion from Simini paper
         N = 1 # to get 0.11 as proportion
         T_i = (N_c/N) # want only rate, not num people. original:  m_i * (N_c/N)
         
