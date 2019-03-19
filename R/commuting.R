@@ -43,7 +43,7 @@ disnet_commuting = function(g, N_c = 0.11)
                                  data = g_edges, FUN = sum)[["V1"]]
 
     # rounding commuting proportion to 2 decimal places
-    verts_info$sigma = round(verts_info$sigma, 2)
+    # verts_info$sigma = round(verts_info$sigma, 2)
 
     ## Create graph file
     g_comm = igraph::graph_from_data_frame(g_edges,
@@ -115,7 +115,7 @@ disnet_comm1 = function(j, edges_subset, i, N_c) {
 #' 
 #' @export
 
-disnet_comm2 = function(i,test_edges, N_c) {
+disnet_comm2 = function(i, test_edges, N_c) {
     edges_subset = test_edges[ test_edges$from %in% i, ]
     all_j = edges_subset$to
     print(paste0("working on node: ", i))
@@ -164,7 +164,10 @@ disnet_comm3 = function(g){
 
 
 # *** Take two
-
+# THIS DOESN'T GIVE ACCURATE ANSWERS!!! DO NOT USE IT!!!
+# Till it's fixed
+# doubled checked its results with the test code in flu-net, and it had some right
+# but not others. hence it's unreliable
 disnet_commuting2 = function(g, N_c = 0.11)
 {
     comm_info = disnet_comm3(g)
@@ -177,7 +180,7 @@ disnet_commuting2 = function(g, N_c = 0.11)
     edges_from_to = lapply(edges_from, function(edges_from)
     {
         radii = edges_from$Total_Length
-        lapply(seq_along(radii), function(i, df, radis)
+        lapply(seq_along(radii), function(i, df, radii)
         {
             df = df[ df$Total_Length <= radii[i], ]
         }, edges_from, radii)
