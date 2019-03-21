@@ -4,7 +4,7 @@
 \alias{disnet_comm2}
 \title{disnet_comm2}
 \usage{
-disnet_comm2(i, test_edges)
+disnet_comm2(i, test_edges, N_c)
 }
 \arguments{
 \item{i}{id of the `from` node, for which we want to calculate commuting
@@ -12,6 +12,9 @@ proportion}
 
 \item{test_edges}{the dataframe of the edges which contains the distances
 between the nodes and the population of each edges's}
+
+\item{N_c}{The commuting proportion of the entire population. Default = 0.11 from
+Simini}
 }
 \description{
 Gets commuting rate for all nodes (includes individual node function)

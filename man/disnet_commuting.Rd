@@ -4,10 +4,13 @@
 \alias{disnet_commuting}
 \title{Commuting function}
 \usage{
-disnet_commuting(g)
+disnet_commuting(g, N_c = 0.11)
 }
 \arguments{
 \item{g}{The `graphml` (network) object for which to calculate commuting rates}
+
+\item{N_c}{The commuting proportion of the entire population. Default = 0.11 from
+Simini}
 }
 \description{
 `disnet_commuting` gets the `from` nodes, and sends them as the parameter for

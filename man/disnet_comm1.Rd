@@ -4,7 +4,7 @@
 \alias{disnet_comm1}
 \title{disnet_comm1}
 \usage{
-disnet_comm1(j, edges_subset, i)
+disnet_comm1(j, edges_subset, i, N_c)
 }
 \arguments{
 \item{j}{all the nodes `i` is connected to}
@@ -12,6 +12,9 @@ disnet_comm1(j, edges_subset, i)
 \item{edges_subset}{subset of `nd_edges` with all outgoing edges of `i`}
 
 \item{i}{the node for which commuting proportion is being calculated}
+
+\item{N_c}{The commuting proportion of the entire population. Default = 0.11 from
+Simini}
 }
 \description{
 gets commuting rate for each individual node (hence it's for individual nodes)
