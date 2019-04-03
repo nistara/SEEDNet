@@ -6,7 +6,7 @@ Authors@R: c(
 	   person("Duncan Temple", "Lang", role = "aut"))
 Description: This package simulates a dicrete time, stochastic, metapopulation disease model over a geospatial network. It integrates local commuting rate (via the radiation model) as a proxy for human movement across the network. 
 Depends: R (>= 3.3.3)
-License: MIT?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/nistara/disnet

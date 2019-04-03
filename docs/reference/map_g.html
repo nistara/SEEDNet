@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • disnet</title>
+<title>Function to map the network — map_g • disnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,7 +30,11 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Function to map the network — map_g" />
+
+<meta property="og:description" content="This function creates a leaflet map of the network, and highlights nodes
+of interest specified by the user." />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -47,7 +51,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -94,78 +98,49 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Function to map the network</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/map_net.R'><code>R/map_net.R</code></a></small>
+    <div class="hidden name"><code>map_g.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    
+    <p>This function creates a leaflet map of the network, and highlights nodes
+of interest specified by the user.</p>
+    
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
-
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="disnet_comm1.html">disnet_comm1()</a></code> </p>
-        </td>
-        <td><p>disnet_comm1</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="disnet_comm2.html">disnet_comm2()</a></code> </p>
-        </td>
-        <td><p>disnet_comm2</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="disnet_comm3.html">disnet_comm3()</a></code> </p>
-        </td>
-        <td><p>disnet_comm3</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="disnet_commuting.html">disnet_commuting()</a></code> </p>
-        </td>
-        <td><p>Commuting function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="disnet_sim_setup.html">disnet_sim_setup()</a></code> </p>
-        </td>
-        <td><p>Set up graph file to run simulations upon</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="disnet_simulate.html">disnet_simulate()</a></code> </p>
-        </td>
-        <td><p>Main simulation function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="map_g.html">map_g()</a></code> </p>
-        </td>
-        <td><p>Function to map the network</p></td>
-      </tr>
-    </tbody>
+    <pre class="usage"><span class='fu'>map_g</span>(<span class='no'>g</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>g</th>
+      <td><p>The network to be mapped.</p></td>
+    </tr>
+    <tr>
+      <th>nodes</th>
+      <td><p>The nodes to be highlighted (in red vs. the default blue).</p></td>
+    </tr>
     </table>
-  </div>
+    
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleData"</span>, <span class='st'>"g.rds"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"disnet"</span>)
+<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)
+<span class='no'>map</span> <span class='kw'>=</span> <span class='fu'>map_g</span>(<span class='no'>g</span>)</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#arguments">Arguments</a></li>
+            
+      <li><a href="#examples">Examples</a></li>
     </ul>
+
   </div>
 </div>
 
