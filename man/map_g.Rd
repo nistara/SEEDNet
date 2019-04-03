@@ -4,7 +4,7 @@
 \alias{map_g}
 \title{Function to map the network}
 \usage{
-map_g(g, nodes = NA)
+map_g(g, nodes = NULL)
 }
 \arguments{
 \item{g}{The network to be mapped.}

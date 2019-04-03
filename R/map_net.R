@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------
 # *** Map network vertices, and highlight user-defined nodes of interest
 # ------------------------------------------------------------------------------
-map_g = function(g, nodes = NA) {
+map_g = function(g, nodes = NULL) {
     # browser()
     net_verts = igraph::as_data_frame(g, "vertices")
     map = leaflet::leaflet() %>%
@@ -31,14 +31,14 @@ map_g = function(g, nodes = NA) {
                                        "<br> pop:", net_verts$pop,
                                        "<br> lat:", net_verts$lat,
                                        "<br> lon:", net_verts$lon))
-    if(!is.na(nodes)) {
+    if(!is.null(nodes)) {
         df = net_verts[ net_verts$name %in% nodes, ]
         map = map %>%   
         leaflet::addCircleMarkers(data = df, ~lon, ~lat,
                          radius = 5,
                          stroke = FALSE,
                          color= "red",
-                         fillOpacity = 0.5,
+                         fillOpacity = 0.7,
                          popup = paste("name:", df$name,
                                        "<br> pop:", df$pop,
                                        "<br> lat:", df$lat,
