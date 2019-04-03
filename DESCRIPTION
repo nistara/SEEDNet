@@ -19,4 +19,6 @@ Imports:
     igraph,
     devtools,
     future.apply,
-    dplyr
+    dplyr,
+    leaflet,
+    magrittr
