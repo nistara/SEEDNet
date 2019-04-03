@@ -21,3 +21,4 @@ Imports:
     future.apply,
     dplyr,
     leaflet,
+    magrittr
