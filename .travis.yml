@@ -9,3 +9,8 @@ warnings_are_errors: false
 
 r_packages:
  - dplyr
+ - igraph
+ - future.apply
+ - leaflet
+ - magrittr
+ - gtools
