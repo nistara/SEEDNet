@@ -39,19 +39,20 @@ get_inf_info = function(n, sims, sim_info, sim_l) {
 
 
 
-get_inf_summ = function(inf_info) {
+get_sim_summ = function(inf_info) {
     sim_summ_l = sapply(split(inf_info, inf_info$type), nrow)
 
 
     sim_summ_info = round(inf_info %>% group_by(type) %>%
                           summarise_all(funs(mean, min, max)), 1)
 
-    sim_summ_info = Map(cbind, n = sim_summ_l, sim_summ_info)
+    sim_summ_info$n = sim_summ_l
 
 
-    sim_summ_info[ , c("n", "type", "nds_min", "nds_mean", "nds_max",
+    as.data.frame(
+        sim_summ_info[ , c("n", "type", "nds_min", "nds_mean", "nds_max",
                        "days_min", "days_mean", "days_max",
-                       "inf_min", "inf_mean", "inf_max")]
+                       "inf_min", "inf_mean", "inf_max")])
 }
 
 
