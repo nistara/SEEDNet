@@ -16,5 +16,5 @@ r_packages:
   - dplyr
   - leaflet
   - magrittr
-  - string
+  - stringr
  
