@@ -4,11 +4,9 @@
 \alias{get_outbrks}
 \title{Subset simulations that were outbreaks}
 \usage{
-get_outbrks(n, sims, inf_info)
+get_outbrks(sims, inf_info)
 }
 \arguments{
-\item{n}{Iteration}
-
 \item{sims}{Simulation results}
 
 \item{inf_info}{Infection information for each simulation}

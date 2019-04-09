@@ -4,11 +4,9 @@
 \alias{get_inf_info}
 \title{Compare outbreak information across simulations}
 \usage{
-get_inf_info(n, sims, sim_info, sim_l)
+get_inf_info(sims, sim_info, sim_l)
 }
 \arguments{
-\item{n}{The iteration number}
-
 \item{sims}{Individual simulation results}
 
 \item{sim_info}{Simulation information files}

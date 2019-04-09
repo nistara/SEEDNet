@@ -1,17 +1,13 @@
 
 #' Compare outbreak information across simulations
 #'
-#' @param n The iteration number
 #' @param sims Individual simulation results
 #' @param sim_info Simulation information files
 #' @param sim_l Simulation length information
 #'
 #' @export
 #' 
-get_inf_info = function(n, sims, sim_info, sim_l) {
-    sims = sims[[n]]
-    sim_info = sim_info[[n]]
-    sim_l = sim_l[[n]]
+get_inf_info = function(sims, sim_info, sim_l) {
     nds = sapply(sims, function(l) {
         nds = lapply(l, function(df) {
             df = unique(df[ df$I > 0 | df$Ia > 0, "name"])        
@@ -45,7 +41,7 @@ get_inf_info = function(n, sims, sim_info, sim_l) {
 #' outbreak lengths, and numbers infected. 
 #'
 #' @export
-
+#' 
 get_sim_summ = function(inf_info) {
     sim_summ_l = sapply(split(inf_info, inf_info$type), nrow)
 
@@ -68,29 +64,27 @@ get_sim_summ = function(inf_info) {
 
 #' Subset information for outbreaks
 #'
-#' @param n Iteration
 #' @param sim_info Simulation information
 #' @param inf_info Infection information for each simulation
 #'
 #' @export
 #'
 # choosing those that belong to type 3, based upon inf_info
-get_outbrks_info = function(n, sim_info, inf_info){
-    sim_info[[n]][ inf_info[[n]]$type == 3 ]
+get_outbrks_info = function(sim_info, inf_info){
+    sim_info[ inf_info$type == 3 ]
 }
 
 
 #' Subset simulations that were outbreaks
 #'
-#' @param n Iteration
 #' @param sims Simulation results
 #' @param inf_info Infection information for each simulation
 #'
 #' @export
 #'
 # choosing those that belong to type 3, based upon inf_info
-get_outbrks = function(n, sims, inf_info){
-    sims[[n]][ inf_info[[n]]$type == 3 ]
+get_outbrks = function(sims, inf_info){
+    sims[ inf_info$type == 3 ]
 }
 
 
