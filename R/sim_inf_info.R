@@ -39,6 +39,13 @@ get_inf_info = function(n, sims, sim_info, sim_l) {
 
 
 
+#' Get summary of outbreak types
+#'
+#' @param inf_info Information on outbreak infections wrt nodes affected,
+#' outbreak lengths, and numbers infected. 
+#'
+#' @export
+
 get_sim_summ = function(inf_info) {
     sim_summ_l = sapply(split(inf_info, inf_info$type), nrow)
 
