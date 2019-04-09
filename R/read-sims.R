@@ -1,0 +1,58 @@
+# ==============================================================================
+# Code for reading in simulation files
+# ==============================================================================
+
+#' Get simulation information function
+#'
+#' Reads in the simulation information files
+#'
+#' @param sim_dir The directory containing simulation results.
+#'
+#' @export
+#' 
+get_sim_info = function(sim_dir) {
+    fnames = list.files(sim_dir, pattern = "_info")
+    fnames = mixedsort(fnames)[1:500] # coz mean R0 has 1000 simulations
+    sim_info = lapply(fnames, function(f, sim_dir) {
+        readRDS(paste0(sim_dir, "/", f))
+    }, sim_dir)
+    return(sim_info)
+}
+
+
+#' Get simulation durations/lengths
+#'
+#' This function uses the simulation information files to get the lengths of
+#' each simulations
+#'
+#' @param sim_info_df The simulation information files for each simulation
+#'
+#' @export
+#' 
+get_sim_l = function(sim_info_df) {
+    sim_lengths = lapply(sim_info_df, function(x) {
+        if( is.null(nrow(x)) & length(x) == 5 ) {
+            rows = 1
+        } else {
+            rows = nrow(x)
+        }
+    })
+    do.call(rbind, sim_lengths)
+}
+
+
+#' Read in individual simulation files
+#'
+#' Imports each individual simulation file for the set of simulations.
+#'
+#' @param sim_dir The directory containing simulation results.
+#'
+#' @export
+#' 
+get_sims = function(sim_dir) {
+    fnames = list.files(sim_dir, pattern = "[0-9].RDS")
+    fnames = mixedsort(fnames)[1:500] # coz mean R0 has 1000 simulations
+    sims = lapply(fnames, function(f, sim_dir) {
+        readRDS(paste0(sim_dir, "/", f))
+    }, sim_dir)
+}

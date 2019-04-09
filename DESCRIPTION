@@ -21,4 +21,6 @@ Imports:
     future.apply,
     dplyr,
     leaflet,
-    magrittr
+    magrittr,
+    gtools,
+    doBy
