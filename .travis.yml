@@ -15,5 +15,4 @@ r_packages
  - magrittr
  - gtools
 
-r_build_args: "--no-build-vignettes"
-r_check_args: "--no-build-vignettes --as-cran"
+_R_CHECK_CRAN_INCOMING_=false
