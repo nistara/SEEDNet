@@ -49,10 +49,17 @@ get_sim_l = function(sim_info_df) {
 #'
 #' @export
 #' 
-get_sims = function(sim_dir) {
+get_sims = function(sim_dir, silent = TRUE) {
     fnames = list.files(sim_dir, pattern = "[0-9].RDS")
     fnames = stringr::str_sort(fnames, numeric = TRUE)
-    sims = lapply(fnames, function(f, sim_dir) {
-        readRDS(paste0(sim_dir, "/", f))
-    }, sim_dir)
+    if(silent) {
+        lapply(fnames, function(f, sim_dir) {
+            readRDS(paste0(sim_dir, "/", f))
+        }, sim_dir)
+    } else {
+        lapply(fnames, function(f, sim_dir) {
+            print(f)
+            readRDS(paste0(sim_dir, "/", f))
+        }, sim_dir)
+    }
 }
