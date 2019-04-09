@@ -12,7 +12,7 @@
 #' 
 get_sim_info = function(sim_dir) {
     fnames = list.files(sim_dir, pattern = "_info")
-    fnames = gtools::mixedsort(fnames)[1:500] # coz mean R0 has 1000 simulations
+    fnames = stringr::str_sort(fnames, numeric = TRUE)
     sim_info = lapply(fnames, function(f, sim_dir) {
         readRDS(paste0(sim_dir, "/", f))
     }, sim_dir)
@@ -51,7 +51,7 @@ get_sim_l = function(sim_info_df) {
 #' 
 get_sims = function(sim_dir) {
     fnames = list.files(sim_dir, pattern = "[0-9].RDS")
-    fnames = gtools::mixedsort(fnames)[1:500] # coz mean R0 has 1000 simulations
+    fnames = stringr::str_sort(fnames, numeric = TRUE)
     sims = lapply(fnames, function(f, sim_dir) {
         readRDS(paste0(sim_dir, "/", f))
     }, sim_dir)
