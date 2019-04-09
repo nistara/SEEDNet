@@ -4,10 +4,13 @@
 \alias{get_sims}
 \title{Read in individual simulation files}
 \usage{
-get_sims(sim_dir)
+get_sims(sim_dir, silent = TRUE)
 }
 \arguments{
 \item{sim_dir}{The directory containing simulation results.}
+
+\item{silent}{Option to print directory and files being read in.
+Default is TRUE (don't print).}
 }
 \description{
 Imports each individual simulation file for the set of simulations.

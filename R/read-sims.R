@@ -46,7 +46,9 @@ get_sim_l = function(sim_info_df) {
 #' Imports each individual simulation file for the set of simulations.
 #'
 #' @param sim_dir The directory containing simulation results.
-#'
+#' @param silent Option to print directory and files being read in.
+#'               Default is TRUE (don't print).
+#' 
 #' @export
 #' 
 get_sims = function(sim_dir, silent = TRUE) {
@@ -57,8 +59,11 @@ get_sims = function(sim_dir, silent = TRUE) {
             readRDS(paste0(sim_dir, "/", f))
         }, sim_dir)
     } else {
+
+        cat("-------------------------------------------------------\n")
+        cat("******** Dir: ", sim_dir, "\n")
         lapply(fnames, function(f, sim_dir) {
-            print(f)
+            cat("\r\tFile: ", f)
             readRDS(paste0(sim_dir, "/", f))
         }, sim_dir)
     }
