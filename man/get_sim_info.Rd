@@ -4,7 +4,7 @@
 \alias{get_sim_info}
 \title{Get simulation information function}
 \usage{
-get_sim_info(sim_dir)
+get_sim_info(sim_dir, nsims = NA)
 }
 \arguments{
 \item{sim_dir}{The directory containing simulation results.}

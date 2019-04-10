@@ -118,9 +118,9 @@ inf_times_fxnI = function(outbrks, nd_names) {
 }
 
 
-inf_times_fxnII = function(n, nd_infs, nd_inf_info, pr=0.3){
-    nd_infs = nd_infs[[n]]
-    nd_inf_info = nd_inf_info[[n]]
+inf_times_fxnII = function(nd_infs, nd_inf_info, pr=0.3){
+    # nd_infs = nd_infs[[n]]
+    # nd_inf_info = nd_inf_info[[n]]
     nd_infs[ nd_inf_info$av_inf_durprop >= pr ]
 }
 
@@ -175,12 +175,12 @@ inf_times_fxnIII = function(nd_infs, type = "max"){
     times = lapply(times, function(df) {
         data.frame(order_mean = mean(df$order),
                    order_median = median(df$order),
-                   order_mode = Rmisc::Mode(df$order),
+                   order_mode = Mode(df$order),
                    order_sd = sd(df$order),
                    start_mean = mean(df$inf_start),
                    start_sd = sd(df$inf_start),
                    start_median = median(df$inf_start),
-                   start_mode = Rmisc::Mode(df$inf_start),
+                   start_mode = Mode(df$inf_start),
                    len_mean = mean(df$inf_len),
                    len_sd = sd(df$inf_len),
                    len_median = median(df$inf_len),
@@ -195,14 +195,11 @@ inf_times_fxnIII = function(nd_infs, type = "max"){
 }
 
 
-
 inf_times_fxn = function(outbrks, nd_names, nd_inf_info, type = "max", pr = 0.3){
-    nd_infs = lapply(outbrks, inf_times_fxnI, nd_names)
-    inf_timesII = lapply(seq_along(nd_infs), inf_times_fxnII,
-                         nd_infs, nd_inf_info, pr)
-    lapply(inf_timesII, inf_times_fxnIII, type)
+    nd_infs = inf_times_fxnI(outbrks, nd_names)
+    inf_timesII = inf_times_fxnII(nd_infs, nd_inf_info, pr)
+    inf_times_fxnIII(inf_timesII, type)
 }
-
 
 
 inf_times_obs_fxn = function(inf_times) {
@@ -301,3 +298,49 @@ inf_times_fxnIII_for_plot = function(nd_infs, type = "max")
 }
 
 
+
+
+
+# ==============================================================================
+# Function for smarter ls
+# ==============================================================================
+.ls.objects <- function (pos = 1, pattern, order.by,
+                        decreasing=FALSE, head=FALSE, n=5) {
+    napply <- function(names, fn) sapply(names, function(x)
+                                         fn(get(x, pos = pos)))
+    names <- ls(pos = pos, pattern = pattern)
+    obj.class <- napply(names, function(x) as.character(class(x))[1])
+    obj.mode <- napply(names, mode)
+    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
+    obj.prettysize <- napply(names, function(x) {
+                           capture.output(format(utils::object.size(x), units = "auto")) })
+    obj.size <- napply(names, object.size)
+    obj.dim <- t(napply(names, function(x)
+                        as.numeric(dim(x))[1:2]))
+    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
+    obj.dim[vec, 1] <- napply(names, length)[vec]
+    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)
+    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")
+    if (!missing(order.by))
+        out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    if (head)
+        out <- head(out, n)
+    out
+}
+
+# shorthand
+lsos <- function(..., n=10) {
+    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+}
+
+if(FALSE){
+    lsos()
+}
+
+# Function for Mode
+# ==============================================================================
+# ref: https://stackoverflow.com/a/8189441/5443003
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
