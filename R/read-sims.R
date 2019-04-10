@@ -66,5 +66,6 @@ get_sims = function(sim_dir, silent = TRUE) {
             cat("\r\tFile: ", f)
             readRDS(paste0(sim_dir, "/", f))
         }, sim_dir)
+        cat("\n")
     }
 }
