@@ -8,11 +8,11 @@
 #' 
 get_sim_lines = function(i, f_outbrks_info, f_outbrks_l) {
     # Read in outbreak info & length files----------------------------
-    outbrks_info = readRDS(f_outbrk_info[i])
-    outbrks_l = readRDS(f_outbrk_l[i])
+    outbrks_info = readRDS(f_outbrks_info[i])
+    outbrks_l = readRDS(f_outbrks_l[i])
 
     # Get sim name--------------------------------------------------------------
-    sim_name = gsub("outbrks-info_", "", strsplit(f_outbrk_info[i], "/")[[1]][3])
+    sim_name = gsub("outbrks-info_", "", strsplit(f_outbrks_info[i], "/")[[1]][3])
 
     # getting infection info----------------------------------------------------
     n = max(outbrks_l)
