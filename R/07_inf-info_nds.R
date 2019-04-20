@@ -124,23 +124,25 @@ inf_times_fxnII = function(nd_infs, nd_inf_info, pr=0.3){
     nd_infs[ nd_inf_info$av_inf_durprop >= pr ]
 }
 
-    
-inf_times_fxnIII = function(nd_infs, type = "max"){
-    inf_times = lapply(nd_infs, function(df, type) {
-        df = df[ , -1]
-        rownames(df) = NULL
 
-        inf_info = apply(df, 1, function(sim) {
-            sim = sim[ !is.na(sim) ]
-            sim = ifelse(sim > 0, 1, 0)
-            inf_start = which(diff(c(0, sim)) == 1)
-            inf_stop = which(diff(c(sim, 0)) == -1)
-            inf_len = (inf_stop - inf_start + 1)
-            
-            if(length(inf_start) == 0){
-                 data.frame(inf_start = 0,
-                                   inf_stop = 0,
-                                   inf_len = 0)
+if(FALSE) {
+    
+    inf_times_fxnIII = function(nd_infs, type = "max"){
+        inf_times = lapply(nd_infs, function(df, type) {
+            df = df[ , -1]
+            rownames(df) = NULL
+
+            inf_info = apply(df, 1, function(sim) {
+                sim = sim[ !is.na(sim) ] # I don't think this line is needed. TO CHECK
+                sim = ifelse(sim > 0, 1, 0)
+                inf_start = which(diff(c(0, sim)) == 1)
+                inf_stop = which(diff(c(sim, 0)) == -1)
+                inf_len = (inf_stop - inf_start + 1)
+                
+                if(length(inf_start) == 0){
+                    data.frame(inf_start = 0,
+                               inf_stop = 0,
+                               inf_len = 0)
                 } else {
                     if(type %in% "max"){
                         data.frame(inf_start = inf_start[ which.max(inf_len) ],
@@ -154,101 +156,259 @@ inf_times_fxnIII = function(nd_infs, type = "max"){
                         }
                     }
                 }
-        })
+            })
 
-        inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info))
-        inf_info
-    }, type)
-    
-    inf_times = Map(cbind, name = names(nd_infs), inf_times)
-    names(inf_times) = names(nd_infs)
-    all_times = do.call(rbind, inf_times)
-    times = lapply(split(all_times, all_times$sim), function(sim) {
-        rownames(sim) = NULL
-        sim = sim[ sim$inf_start != 0, ]
-        sim = sim[ order(sim$inf_start), ]
-        sim$order = 1:nrow(sim)
-        sim
-    })
-    times = do.call(rbind, times)
-    times = split(times, times$name)
-    times = lapply(times, function(df) {
-        data.frame(order_mean = mean(df$order),
-                   order_median = median(df$order),
-                   order_mode = Mode(df$order),
-                   order_sd = sd(df$order),
-                   start_mean = mean(df$inf_start),
-                   start_sd = sd(df$inf_start),
-                   start_median = median(df$inf_start),
-                   start_mode = Mode(df$inf_start),
-                   len_mean = mean(df$inf_len),
-                   len_sd = sd(df$inf_len),
-                   len_median = median(df$inf_len),
-                   stringsAsFactors = FALSE)
-    })
-    times = do.call(rbind,
-                    Map(cbind, times,
-                        name = names(times), stringsAsFactors = FALSE))
-    times = times[ order(times$start_median), ]
-    rownames(times) = NULL
-    times
+            inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info))
+            inf_info
+        }, type)
+        
+        inf_times = Map(cbind, name = names(nd_infs), inf_times)
+        names(inf_times) = names(nd_infs)
+        all_times = do.call(rbind, inf_times)
+        times = lapply(split(all_times, all_times$sim), function(sim) {
+            rownames(sim) = NULL
+            sim = sim[ sim$inf_start != 0, ]
+            sim = sim[ order(sim$inf_start), ]
+            sim$order = 1:nrow(sim)
+            sim
+        })
+        times = do.call(rbind, times)
+        times = split(times, times$name)
+        times = lapply(times, function(df) {
+            data.frame(order_mean = mean(df$order),
+                       order_median = median(df$order),
+                       order_mode = Mode(df$order),
+                       order_sd = sd(df$order),
+                       start_mean = mean(df$inf_start),
+                       start_sd = sd(df$inf_start),
+                       start_median = median(df$inf_start),
+                       start_mode = Mode(df$inf_start),
+                       len_mean = mean(df$inf_len),
+                       len_sd = sd(df$inf_len),
+                       len_median = median(df$inf_len),
+                       stringsAsFactors = FALSE)
+        })
+        times = do.call(rbind,
+                        Map(cbind, times,
+                            name = names(times), stringsAsFactors = FALSE))
+        times = times[ order(times$start_median), ]
+        rownames(times) = NULL
+        times
+    }
+
 }
 
 
-inf_times_fxn = function(outbrks, nd_names, nd_inf_info, type = "max", pr = 0.3){
+inf_times_fxn = function(outbrks, nd_names, nd_inf_info, pr = 0.3){
     nd_infs = inf_times_fxnI(outbrks, nd_names)
     inf_timesII = inf_times_fxnII(nd_infs, nd_inf_info, pr)
-    inf_times_fxnIII(inf_timesII, type)
+    inf_times_fxnIII(inf_timesII)
 }
 
 
-inf_times_obs_fxn = function(inf_times) {
-    obs_order = data.frame(city = c("Kigali", "Gisenyi", "Muhanga",
-                                             "Musanze", "Cyangugu", "Cyangugu",
-                                             "Cyangugu", "Huye", "Kibungo",
-                                             "Kibungo"),
-                              name = c("890", "1239", "620",
-                                              "1451", "162", "174",
-                                              "180", "78", "510", "539"),
-                              stringsAsFactors = FALSE)
-    obs_order$obs_order = as.numeric(
-                                 factor(obs_order$city,
-                                        levels = unique(obs_order$city)))
-    lapply(inf_times, function(df, obs) dplyr::left_join(df, obs_order, by = "name"))
-}
+inf_times_fxnIII = function(nd_infs) {
 
-
-inf_times_for_plot = function(outbrks,
-                              nd_names,
-                              nd_inf_info,
-                              type = "max",
-                              pr = 0.3)
-{
-    nd_infs = lapply(outbrks, inf_times_fxnI, nd_names)
-    inf_timesII = lapply(seq_along(nd_infs), inf_times_fxnII,
-                         nd_infs, nd_inf_info, pr)
-        lapply(inf_timesII, inf_times_fxnIII_for_plot, type)
-    
-}
-
-inf_times_fxnIII_for_plot = function(nd_infs, type = "max")
-{
-
-    inf_times = lapply(nd_infs, function(df, type) {
+    inf_times = lapply(nd_infs, function(df) {
         df = df[ , -1]
         rownames(df) = NULL
 
         inf_info = apply(df, 1, function(sim) {
             sim = sim[ !is.na(sim) ]
             sim = ifelse(sim > 0, 1, 0)
-            inf_start = which(diff(c(0, sim)) == 1)
-            inf_stop = which(diff(c(sim, 0)) == -1)
-            inf_len = (inf_stop - inf_start + 1)
-            
-            if(length(inf_start) == 0){
-                 data.frame(inf_start = 0,
-                                   inf_stop = 0,
-                            inf_len = 0)
+
+            if(sum(sim) > 0) {
+                inf_start = which(diff(c(0, sim)) == 1)
+                inf_stop = which(diff(c(sim, 0)) == -1)
+                inf_len = (inf_stop - inf_start + 1)
+                n = length(inf_start)
+            } else {
+                inf_start = 0
+                inf_stop = 0
+                inf_len = 0
+                n = 0
+            }
+
+            data.frame(inf_start = inf_start,
+                       inf_stop = inf_stop,
+                       inf_len = inf_len,
+                       n = n)
+        })
+
+        inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info,
+                                      stringsAsFactors = FALSE))
+        rownames(inf_info) = NULL
+        inf_info
+
+    })
+    
+    # inf_times = Map(cbind, name = names(nd_infs), inf_times)
+    names(inf_times) = names(nd_infs)
+    inf_times
+
+}
+
+
+get_all_times_nd = function(inf_times) {
+    all_times = lapply(seq_along(inf_times), function(i, inf_times) {
+        nd_name = names(inf_times)[ i ] 
+        df_nd = inf_times [[ i ]]
+        df_nd = df_nd[ df_nd$n != 0, ]
+        max_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
+            inf_index = which.max(df_sim$inf_len)
+            data.frame(inf_start = df_sim$inf_start[ inf_index ],
+                       inf_stop = df_sim$inf_stop[ inf_index ],
+                       inf_len = max(df_sim$inf_len),
+                       n = nrow(df_sim))
+        })
+        first_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
+            data.frame(inf_start = df_sim$inf_start[1],
+                       inf_stop = df_sim$inf_stop[1],
+                       inf_len = df_sim$inf_len[1],
+                       n = nrow(df_sim))
+        })
+        mean_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
+            data.frame(inf_start = mean(df_sim$inf_start),
+                       inf_stop = mean(df_sim$inf_stop),
+                       inf_len = mean(df_sim$inf_len),
+                       n = nrow(df_sim))
+        })
+        median_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
+            data.frame(inf_start = median(df_sim$inf_start),
+                       inf_stop = median(df_sim$inf_stop),
+                       inf_len = median(df_sim$inf_len),
+                       n = nrow(df_sim))
+        })
+        last_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
+            inf_index = nrow(df_sim)
+            data.frame(inf_start = df_sim$inf_start[ inf_index ],
+                       inf_stop = df_sim$inf_stop[ inf_index ],
+                       inf_len = df_sim$inf_len[ inf_index ],
+                       n = nrow(df_sim))
+        })
+        times = list(max_times = max_times,
+                     first_times = first_times,
+                     mean_times = mean_times,
+                     median_times = median_times,
+                     last_times = last_times)
+        times = lapply(times, function(times, sim, nd_name) {
+            if(length(times) == 0) {
+                data.frame(
+                    name = nd_name,
+                    sim = 1,
+                    inf_start = 0,
+                    inf_stop = 0,
+                    inf_len = 0,
+                    n = 0)
+            } else {
+                df = do.call(rbind, Map(cbind,
+                                        name = nd_name,
+                                        sim = sim,
+                                        times,
+                                        stringsAsFactors = FALSE))
+                rownames(df) = NULL
+                df
+            }
+        }, sim = unique(df_nd$sim), nd_name)
+
+    }, inf_times)
+}
+
+
+get_all_times_sim = function(all_times) {
+    all_times_bind = do.call(Map, c(f = rbind, all_times))
+    times_ind = lapply(all_times_bind,  function(times) {
+        times = lapply(split(times, times$sim), function(sim) {
+            rownames(sim) = NULL
+            sim = sim[ sim$inf_start != 0, ]
+            # sim = sim[ order(sim$inf_start), ]
+            # sim$order = 1:nrow(sim)
+            sim_sorted = sort(unique(sim$inf_start))
+            sim$order = match(sim$inf_start, sim_sorted)
+            sim = sim[ order(sim$order), ]
+        })
+        times = do.call(rbind, times)
+        times = split(times, times$name)
+        times = lapply(times, function(df) {
+            data.frame(order_mean = mean(df$order),
+                       order_median = median(df$order),
+                       order_mode = Mode(df$order),
+                       order_sd = sd(df$order),
+                       start_mean = mean(df$inf_start),
+                       start_sd = sd(df$inf_start),
+                       start_median = median(df$inf_start),
+                       start_mode = Mode(df$inf_start),
+                       len_mean = mean(df$inf_len),
+                       len_sd = sd(df$inf_len),
+                       len_median = median(df$inf_len),
+                       n_mean = mean(df$n),
+                       stringsAsFactors = FALSE)
+        })
+        times = do.call(rbind,
+                        Map(cbind, times,
+                            name = names(times), stringsAsFactors = FALSE))
+        times = times[ order(times$start_median), ]
+        rownames(times) = NULL
+        times
+    })
+    names(times_ind) = names(all_times_bind)
+    times_ind
+}
+
+
+
+
+
+# ==============================================================================
+# The following is relevant only for Rwanda Influenza for now
+# ==============================================================================
+if(FALSE) {
+    inf_times_obs_fxn = function(inf_times) {
+        obs_order = data.frame(city = c("Kigali", "Gisenyi", "Muhanga",
+                                        "Musanze", "Cyangugu", "Cyangugu",
+                                        "Cyangugu", "Huye", "Kibungo",
+                                        "Kibungo"),
+                               name = c("890", "1239", "620",
+                                        "1451", "162", "174",
+                                        "180", "78", "510", "539"),
+                               stringsAsFactors = FALSE)
+        obs_order$obs_order = as.numeric(
+                                  factor(obs_order$city,
+                                         levels = unique(obs_order$city)))
+        lapply(inf_times, function(df, obs) dplyr::left_join(df, obs_order, by = "name"))
+    }
+
+
+    inf_times_for_plot = function(outbrks,
+                                  nd_names,
+                                  nd_inf_info,
+                                  type = "max",
+                                  pr = 0.3)
+    {
+        nd_infs = lapply(outbrks, inf_times_fxnI, nd_names)
+        inf_timesII = lapply(seq_along(nd_infs), inf_times_fxnII,
+                             nd_infs, nd_inf_info, pr)
+        lapply(inf_timesII, inf_times_fxnIII_for_plot, type)
+        
+    }
+
+    inf_times_fxnIII_for_plot = function(nd_infs, type = "max")
+    {
+
+        inf_times = lapply(nd_infs, function(df, type) {
+            df = df[ , -1]
+            rownames(df) = NULL
+
+            inf_info = apply(df, 1, function(sim) {
+                sim = sim[ !is.na(sim) ]
+                sim = ifelse(sim > 0, 1, 0)
+                inf_start = which(diff(c(0, sim)) == 1)
+                inf_stop = which(diff(c(sim, 0)) == -1)
+                inf_len = (inf_stop - inf_start + 1)
+                
+                if(length(inf_start) == 0){
+                    data.frame(inf_start = 0,
+                               inf_stop = 0,
+                               inf_len = 0)
                 } else {
                     if(type %in% "max"){
                         data.frame(inf_start = inf_start[ which.max(inf_len) ],
@@ -262,39 +422,40 @@ inf_times_fxnIII_for_plot = function(nd_infs, type = "max")
                         }
                     }
                 }
+            })
+
+            inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info,
+                                          stringsAsFactors = FALSE))
+            inf_info
+        }, type)
+        
+        inf_times = Map(cbind, name = names(nd_infs), inf_times, stringsAsFactors = FALSE)
+        names(inf_times) = names(nd_infs)
+        all_times = do.call(rbind, inf_times)
+        times = lapply(split(all_times, all_times$sim), function(sim) {
+            rownames(sim) = NULL
+            sim = sim[ sim$inf_start != 0, ]
+            sim = sim[ order(sim$inf_start), ]
+            sim$order = 1:nrow(sim)
+            sim
         })
+        times = do.call(rbind, times)
 
-        inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info,
-                                      stringsAsFactors = FALSE))
-        inf_info
-    }, type)
-    
-    inf_times = Map(cbind, name = names(nd_infs), inf_times, stringsAsFactors = FALSE)
-    names(inf_times) = names(nd_infs)
-    all_times = do.call(rbind, inf_times)
-    times = lapply(split(all_times, all_times$sim), function(sim) {
-        rownames(sim) = NULL
-        sim = sim[ sim$inf_start != 0, ]
-        sim = sim[ order(sim$inf_start), ]
-        sim$order = 1:nrow(sim)
-        sim
-    })
-    times = do.call(rbind, times)
+        obs_order = data.frame(city = c("Kigali", "Gisenyi", "Muhanga",
+                                        "Musanze", "Cyangugu", "Cyangugu",
+                                        "Cyangugu", "Huye", "Kibungo",
+                                        "Kibungo"),
+                               name = c("890", "1239", "620",
+                                        "1451", "162", "174",
+                                        "180", "78", "510", "539"),
+                               stringsAsFactors = FALSE)
+        obs_order$obs_order = as.numeric(
+                                  factor(obs_order$city,
+                                         levels = unique(obs_order$city)))
 
-    obs_order = data.frame(city = c("Kigali", "Gisenyi", "Muhanga",
-                                             "Musanze", "Cyangugu", "Cyangugu",
-                                             "Cyangugu", "Huye", "Kibungo",
-                                             "Kibungo"),
-                              name = c("890", "1239", "620",
-                                              "1451", "162", "174",
-                                              "180", "78", "510", "539"),
-                              stringsAsFactors = FALSE)
-    obs_order$obs_order = as.numeric(
-                                 factor(obs_order$city,
-                                        levels = unique(obs_order$city)))
-
-    obs_city_times = dplyr::left_join(obs_order, times, by = "name")
-    obs_city_times
+        obs_city_times = dplyr::left_join(obs_order, times, by = "name")
+        obs_city_times
+    }
 }
 
 
