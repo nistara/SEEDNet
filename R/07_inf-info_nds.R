@@ -1,5 +1,5 @@
 # ==============================================================================
-# Node specific infection probabilities
+# * Node specific infection probabilities
 # ==============================================================================
 
 # A. Ways to look at a node's culpability of being infected:
@@ -37,9 +37,11 @@ if(FALSE){
 
 
 # ------------------------------------------------------------------------------
-# The function
+# ** nd_inf_fxn
 # ------------------------------------------------------------------------------
-nd_inf_fxn = function(outbrks, nd_names){
+nd_inf_fxn = function(outbrks){
+
+    nd_names = outbrks[[1]][[1]]$name
 
     is_nd_inf = lapply(outbrks, function(outbrk){
         do.call(cbind,
@@ -47,6 +49,12 @@ nd_inf_fxn = function(outbrks, nd_names){
                     nd_inf = ifelse( (TS$I + TS$Ia) > 0, 1, 0)
                 }))
     })
+
+    # number of outbreaks in which node was infected at all
+    n_outbrks = rowSums(do.call(cbind,
+                                   lapply(is_nd_inf, function(outbrk){
+                                       ifelse(rowSums(outbrk) > 0, 1, 0)
+                                   })))
 
     # av number of days that node was infected during outbreaks
     av_inf_days = rowMeans(do.call(cbind,
@@ -79,6 +87,7 @@ nd_inf_fxn = function(outbrks, nd_names){
 
     # resulting nd specific dataframe
     data.frame(name = nd_names,
+               n_outbrks = n_outbrks,
                av_inf_days = av_inf_days,
                av_inf_durprop = av_inf_durprop,
                av_inf = av_inf,
@@ -89,7 +98,7 @@ nd_inf_fxn = function(outbrks, nd_names){
 
 
 # ==============================================================================
-# Getting start and stop times
+# * Getting start and stop times
 # ==============================================================================
 
 # Steps:
@@ -102,8 +111,21 @@ nd_inf_fxn = function(outbrks, nd_names){
 #   once outbreaks were over (since the dimensions of the dataframe extent to
 #   the maximum outbreak length( max(sim_l) #  375 )
 
-inf_times_fxnI = function(outbrks, nd_names) {
 
+# ** inf_times_fxn
+# ------------------------------------------------------------------------------
+inf_times_fxn = function(outbrks, nd_inf_info, pr = 0.3){
+    nd_infs = inf_times_fxnI(outbrks)
+    inf_timesII = inf_times_fxnII(nd_infs, nd_inf_info, pr)
+    inf_times = inf_times_fxnIII(inf_timesII)
+    all_times_nd = get_all_times_nd(inf_times)
+    all_times_sim = get_all_times_sim(all_times_nd)
+}
+
+# ** inf_times_fxnI
+# ------------------------------------------------------------------------------
+inf_times_fxnI = function(outbrks) {
+    nd_names = outbrks[[1]][[1]]$name
     nd_infs = lapply(outbrks, function(outbrk, nd_names) {
         nd_infs = lapply(outbrk, function(TS) {
             nd_inf = TS$I + TS$Ia
@@ -118,6 +140,8 @@ inf_times_fxnI = function(outbrks, nd_names) {
 }
 
 
+# ** inf_times_fxnII
+# ------------------------------------------------------------------------------
 inf_times_fxnII = function(nd_infs, nd_inf_info, pr=0.3){
     # nd_infs = nd_infs[[n]]
     # nd_inf_info = nd_inf_info[[n]]
@@ -199,15 +223,12 @@ if(FALSE) {
 }
 
 
-inf_times_fxn = function(outbrks, nd_names, nd_inf_info, pr = 0.3){
-    nd_infs = inf_times_fxnI(outbrks, nd_names)
-    inf_timesII = inf_times_fxnII(nd_infs, nd_inf_info, pr)
-    inf_times_fxnIII(inf_timesII)
-}
 
 
+# ** inf_times_fxnIII
+# ------------------------------------------------------------------------------
 inf_times_fxnIII = function(nd_infs) {
-
+    
     inf_times = lapply(nd_infs, function(df) {
         df = df[ , -1]
         rownames(df) = NULL
@@ -220,18 +241,18 @@ inf_times_fxnIII = function(nd_infs) {
                 inf_start = which(diff(c(0, sim)) == 1)
                 inf_stop = which(diff(c(sim, 0)) == -1)
                 inf_len = (inf_stop - inf_start + 1)
-                n = length(inf_start)
+                n_in_outbrks = length(inf_start)
             } else {
                 inf_start = 0
                 inf_stop = 0
                 inf_len = 0
-                n = 0
+                n_in_outbrks = 0
             }
 
             data.frame(inf_start = inf_start,
                        inf_stop = inf_stop,
                        inf_len = inf_len,
-                       n = n)
+                       n_in_outbrks = n_in_outbrks)
         })
 
         inf_info = do.call(rbind, Map(cbind, sim = rownames(df), inf_info,
@@ -248,42 +269,44 @@ inf_times_fxnIII = function(nd_infs) {
 }
 
 
+# ** get_all_times_nd
+# ------------------------------------------------------------------------------
 get_all_times_nd = function(inf_times) {
     all_times = lapply(seq_along(inf_times), function(i, inf_times) {
         nd_name = names(inf_times)[ i ] 
         df_nd = inf_times [[ i ]]
-        df_nd = df_nd[ df_nd$n != 0, ]
+        df_nd = df_nd[ df_nd$n_in_outbrks != 0, ]
         max_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
             inf_index = which.max(df_sim$inf_len)
             data.frame(inf_start = df_sim$inf_start[ inf_index ],
                        inf_stop = df_sim$inf_stop[ inf_index ],
                        inf_len = max(df_sim$inf_len),
-                       n = nrow(df_sim))
+                       n_in_outbrks = nrow(df_sim))
         })
         first_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
             data.frame(inf_start = df_sim$inf_start[1],
                        inf_stop = df_sim$inf_stop[1],
                        inf_len = df_sim$inf_len[1],
-                       n = nrow(df_sim))
+                       n_in_outbrks = nrow(df_sim))
         })
         mean_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
             data.frame(inf_start = mean(df_sim$inf_start),
                        inf_stop = mean(df_sim$inf_stop),
                        inf_len = mean(df_sim$inf_len),
-                       n = nrow(df_sim))
+                       n_in_outbrks = nrow(df_sim))
         })
         median_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
             data.frame(inf_start = median(df_sim$inf_start),
                        inf_stop = median(df_sim$inf_stop),
                        inf_len = median(df_sim$inf_len),
-                       n = nrow(df_sim))
+                       n_in_outbrks = nrow(df_sim))
         })
         last_times = lapply(split(df_nd, df_nd$sim), function(df_sim) {
             inf_index = nrow(df_sim)
             data.frame(inf_start = df_sim$inf_start[ inf_index ],
                        inf_stop = df_sim$inf_stop[ inf_index ],
                        inf_len = df_sim$inf_len[ inf_index ],
-                       n = nrow(df_sim))
+                       n_in_outbrks = nrow(df_sim))
         })
         times = list(max_times = max_times,
                      first_times = first_times,
@@ -298,7 +321,7 @@ get_all_times_nd = function(inf_times) {
                     inf_start = 0,
                     inf_stop = 0,
                     inf_len = 0,
-                    n = 0)
+                    n_in_outbrks = 0)
             } else {
                 df = do.call(rbind, Map(cbind,
                                         name = nd_name,
@@ -314,6 +337,9 @@ get_all_times_nd = function(inf_times) {
 }
 
 
+
+# ** get_all_times_sim
+# ------------------------------------------------------------------------------
 get_all_times_sim = function(all_times) {
     all_times_bind = do.call(Map, c(f = rbind, all_times))
     times_ind = lapply(all_times_bind,  function(times) {
@@ -340,13 +366,13 @@ get_all_times_sim = function(all_times) {
                        len_mean = mean(df$inf_len),
                        len_sd = sd(df$inf_len),
                        len_median = median(df$inf_len),
-                       n_mean = mean(df$n),
+                       n_mean = mean(df$n_in_outbrks),
                        stringsAsFactors = FALSE)
         })
         times = do.call(rbind,
                         Map(cbind, times,
                             name = names(times), stringsAsFactors = FALSE))
-        times = times[ order(times$start_median), ]
+        times = times[ order(times$order_median), ]
         rownames(times) = NULL
         times
     })
@@ -358,8 +384,55 @@ get_all_times_sim = function(all_times) {
 
 
 
+
 # ==============================================================================
-# The following is relevant only for Rwanda Influenza for now
+# * Function for smarter ls
+# ==============================================================================
+.ls.objects <- function (pos = 1, pattern, order.by,
+                        decreasing=FALSE, head=FALSE, n=5) {
+    napply <- function(names, fn) sapply(names, function(x)
+                                         fn(get(x, pos = pos)))
+    names <- ls(pos = pos, pattern = pattern)
+    obj.class <- napply(names, function(x) as.character(class(x))[1])
+    obj.mode <- napply(names, mode)
+    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
+    obj.prettysize <- napply(names, function(x) {
+                           capture.output(format(utils::object.size(x), units = "auto")) })
+    obj.size <- napply(names, object.size)
+    obj.dim <- t(napply(names, function(x)
+                        as.numeric(dim(x))[1:2]))
+    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
+    obj.dim[vec, 1] <- napply(names, length)[vec]
+    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)
+    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")
+    if (!missing(order.by))
+        out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    if (head)
+        out <- head(out, n)
+    out
+}
+
+# shorthand
+lsos <- function(..., n=10) {
+    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+}
+
+if(FALSE){
+    lsos()
+}
+
+
+# * Function for Mode
+# ==============================================================================
+# ref: https://stackoverflow.com/a/8189441/5443003
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+
+# ==============================================================================
+# * Relevant only for Rwanda Influenza for now
 # ==============================================================================
 if(FALSE) {
     inf_times_obs_fxn = function(inf_times) {
@@ -461,47 +534,3 @@ if(FALSE) {
 
 
 
-
-# ==============================================================================
-# Function for smarter ls
-# ==============================================================================
-.ls.objects <- function (pos = 1, pattern, order.by,
-                        decreasing=FALSE, head=FALSE, n=5) {
-    napply <- function(names, fn) sapply(names, function(x)
-                                         fn(get(x, pos = pos)))
-    names <- ls(pos = pos, pattern = pattern)
-    obj.class <- napply(names, function(x) as.character(class(x))[1])
-    obj.mode <- napply(names, mode)
-    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
-    obj.prettysize <- napply(names, function(x) {
-                           capture.output(format(utils::object.size(x), units = "auto")) })
-    obj.size <- napply(names, object.size)
-    obj.dim <- t(napply(names, function(x)
-                        as.numeric(dim(x))[1:2]))
-    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
-    obj.dim[vec, 1] <- napply(names, length)[vec]
-    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)
-    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")
-    if (!missing(order.by))
-        out <- out[order(out[[order.by]], decreasing=decreasing), ]
-    if (head)
-        out <- head(out, n)
-    out
-}
-
-# shorthand
-lsos <- function(..., n=10) {
-    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
-}
-
-if(FALSE){
-    lsos()
-}
-
-# Function for Mode
-# ==============================================================================
-# ref: https://stackoverflow.com/a/8189441/5443003
-Mode <- function(x) {
-  ux <- unique(x)
-  ux[which.max(tabulate(match(x, ux)))]
-}

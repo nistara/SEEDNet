@@ -52,7 +52,7 @@ get_sim_l = function(sim_info_df) {
 #' 
 #' @export
 #' 
-get_sims = function(sim_dir, silent = TRUE, nsims = NA) {
+get_sims = function(sim_dir, silent = FALSE, nsims = NA) {
     fnames = list.files(sim_dir, pattern = "[0-9].RDS")
     fnames = stringr::str_sort(fnames, numeric = TRUE)
     if(!is.na(nsims)) fnames = fnames[ 1:nsims ] 
