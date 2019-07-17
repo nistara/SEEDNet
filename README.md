@@ -2,10 +2,9 @@
 
 [![Build Status](https://travis-ci.com/nistara/disnet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/nistara/disnet)
 
-# disnet
-Compiling the existing code and data into a package for better collaboration.
+# Satellite Enhanced Epidemic Disease Network (SEEDNet)
 
-`disnet` has been designed to simulate influenza (for now) over a network created
+`SEEDNet` has been designed to simulate influenza (for now) over a network created
 by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.  
 
 ## Example datasets

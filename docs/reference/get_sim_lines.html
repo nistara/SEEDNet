@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>disnet_comm1 — disnet_comm1 • disnet</title>
+<title>Get simulation lines for plotting — get_sim_lines • disnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="disnet_comm1 — disnet_comm1" />
+<meta property="og:title" content="Get simulation lines for plotting — get_sim_lines" />
 
-<meta property="og:description" content="gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11" />
+<meta property="og:description" content="Get simulation lines for plotting" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,39 +99,33 @@ Considers a commuting proportion of 11" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>disnet_comm1</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/01_commuting.R'><code>R/01_commuting.R</code></a></small>
-    <div class="hidden name"><code>disnet_comm1.Rd</code></div>
+    <h1>Get simulation lines for plotting</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/09_plot.R'><code>R/09_plot.R</code></a></small>
+    <div class="hidden name"><code>get_sim_lines.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11<!-- % for the entire population --></p>
+    <p>Get simulation lines for plotting</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>disnet_comm1</span>(<span class='no'>j</span>, <span class='no'>edges_subset</span>, <span class='no'>i</span>, <span class='no'>N_c</span>)</pre>
+    <pre class="usage"><span class='fu'>get_sim_lines</span>(<span class='no'>i</span>, <span class='no'>f_outbrks_info</span>, <span class='no'>f_outbrks_l</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>j</th>
-      <td><p>all the nodes `i` is connected to</p></td>
-    </tr>
-    <tr>
-      <th>edges_subset</th>
-      <td><p>subset of `nd_edges` with all outgoing edges of `i`</p></td>
-    </tr>
-    <tr>
       <th>i</th>
-      <td><p>the node for which commuting proportion is being calculated</p></td>
+      <td><p>iteration over simulations to plot</p></td>
     </tr>
     <tr>
-      <th>N_c</th>
-      <td><p>The commuting proportion of the entire population. Default = 0.11 from
-Simini</p></td>
+      <th>f_outbrks_info</th>
+      <td><p>location of file with outbreak information</p></td>
+    </tr>
+    <tr>
+      <th>f_outbrks_l</th>
+      <td><p>location of file with outbreak lengths information</p></td>
     </tr>
     </table>
     

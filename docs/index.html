@@ -66,21 +66,20 @@
   <div class="contents col-md-9">
 
 
-<div id="disnet" class="section level1">
+<div id="satellite-enhanced-epidemic-disease-network-seednet" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#disnet" class="anchor"></a>disnet</h1></div>
-<p>Compiling the existing code and data into a package for better collaboration.</p>
-<p><code>disnet</code> has been designed to simulate influenza (for now) over a network created by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.</p>
+<a href="#satellite-enhanced-epidemic-disease-network-seednet" class="anchor"></a>Satellite Enhanced Epidemic Disease Network (SEEDNet)</h1></div>
+<p><code>SEEDNet</code> has been designed to simulate influenza (for now) over a network created by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.</p>
 <div id="example-datasets" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-datasets" class="anchor"></a>Example datasets</h2>
 <p>While a smaller example dataset is included in <code>inst/sampleData</code>, the bigger examples can be found in this <a href="https://drive.google.com/open?id=1Mr6PKOlWHHRE_rl9d4-ZgtIO822DpwdM">Google Drive link</a>. They include:</p>
 <ol>
 <li>
-<code>g_raw.RDA</code>: For using with <code><a href="reference/disnet_commuting.html">disnet_commuting()</a></code>
+<code>g_raw.RDA</code>: For using with <code>disnet_commuting()</code>
 </li>
 <li>
-<code>g.RDA</code>: For using with <code><a href="reference/disnet_sim_setup.html">disnet_sim_setup()</a></code>
+<code>g.RDA</code>: For using with <code>disnet_sim_setup()</code>
 </li>
 <li>
 <code>sim_intermed.RDA</code>: To run the <code>disnet_simulation()</code> function with.</li>
@@ -108,7 +107,7 @@ f =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation
 g =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(f)
 
 <span class="co"># calculate commuting rates over it</span>
-g_comm =<span class="st"> </span><span class="kw"><a href="reference/disnet_commuting.html">disnet_commuting</a></span>(g)
+g_comm =<span class="st"> </span><span class="kw">disnet_commuting</span>(g)
 
 <span class="co"># select random node to seed infection in</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">890</span>)
@@ -116,12 +115,12 @@ nodes =<span class="st"> </span>igraph<span class="op">::</span><span class="kw"
 seed_nd =<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/igraph/topics/vertex_attr">vertex_attr</a></span>(g_comm, <span class="st">"name"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="dv">1</span><span class="op">:</span>nodes, <span class="dv">1</span>))
 
 <span class="co"># set up the network for simulations</span>
-for_sim =<span class="st"> </span><span class="kw"><a href="reference/disnet_sim_setup.html">disnet_sim_setup</a></span>(g_comm, <span class="dt">seed_nd =</span> seed_nd, <span class="dt">output_dir =</span> <span class="ot">NA</span>)
+for_sim =<span class="st"> </span><span class="kw">disnet_sim_setup</span>(g_comm, <span class="dt">seed_nd =</span> seed_nd, <span class="dt">output_dir =</span> <span class="ot">NA</span>)
 
 <span class="co"># run the simulations over the network</span>
-simres =<span class="st"> </span><span class="kw"><a href="reference/disnet_simulate.html">disnet_simulate</a></span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>)
+simres =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>)
 
-simres2 =<span class="st"> </span><span class="kw"><a href="reference/disnet_simulate.html">disnet_simulate</a></span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>,
+simres2 =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>,
 <span class="dt">parallel =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 <div id="sample-datasets" class="section level2">

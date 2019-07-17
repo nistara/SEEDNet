@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>disnet_comm1 — disnet_comm1 • disnet</title>
+<title>Subset simulations that were outbreaks — get_outbrks • disnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="disnet_comm1 — disnet_comm1" />
+<meta property="og:title" content="Subset simulations that were outbreaks — get_outbrks" />
 
-<meta property="og:description" content="gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11" />
+<meta property="og:description" content="Subset simulations that were outbreaks" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,39 +99,29 @@ Considers a commuting proportion of 11" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>disnet_comm1</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/01_commuting.R'><code>R/01_commuting.R</code></a></small>
-    <div class="hidden name"><code>disnet_comm1.Rd</code></div>
+    <h1>Subset simulations that were outbreaks</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/06_inf-info_sims.R'><code>R/06_inf-info_sims.R</code></a></small>
+    <div class="hidden name"><code>get_outbrks.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11<!-- % for the entire population --></p>
+    <p>Subset simulations that were outbreaks</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>disnet_comm1</span>(<span class='no'>j</span>, <span class='no'>edges_subset</span>, <span class='no'>i</span>, <span class='no'>N_c</span>)</pre>
+    <pre class="usage"><span class='fu'>get_outbrks</span>(<span class='no'>sims</span>, <span class='no'>inf_info</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>j</th>
-      <td><p>all the nodes `i` is connected to</p></td>
+      <th>sims</th>
+      <td><p>Simulation results</p></td>
     </tr>
     <tr>
-      <th>edges_subset</th>
-      <td><p>subset of `nd_edges` with all outgoing edges of `i`</p></td>
-    </tr>
-    <tr>
-      <th>i</th>
-      <td><p>the node for which commuting proportion is being calculated</p></td>
-    </tr>
-    <tr>
-      <th>N_c</th>
-      <td><p>The commuting proportion of the entire population. Default = 0.11 from
-Simini</p></td>
+      <th>inf_info</th>
+      <td><p>Infection information for each simulation</p></td>
     </tr>
     </table>
     

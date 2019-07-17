@@ -4,7 +4,7 @@
 \alias{get_sims}
 \title{Read in individual simulation files}
 \usage{
-get_sims(sim_dir, silent = TRUE, nsims = NA)
+get_sims(sim_dir, silent = FALSE, nsims = NA)
 }
 \arguments{
 \item{sim_dir}{The directory containing simulation results.}

@@ -100,7 +100,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Set up graph file to run simulations upon</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/simulation-setup.R'><code>R/simulation-setup.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/02_simulation-setup.R'><code>R/02_simulation-setup.R</code></a></small>
     <div class="hidden name"><code>disnet_sim_setup.Rd</code></div>
     </div>
 
@@ -195,7 +195,7 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleData"</span>, <span class='st'>"g.rds"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"disnet"</span>)
 <span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)
-<span class='no'>g_comm</span> <span class='kw'>=</span> <span class='fu'><a href='disnet_commuting.html'>disnet_commuting</a></span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; [1] "working on node: 7"
+<span class='no'>g_comm</span> <span class='kw'>=</span> <span class='fu'>disnet_commuting</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; [1] "working on node: 7"
 #&gt; [1] "working on node: 10"
 #&gt; [1] "working on node: 20"
 #&gt; [1] "working on node: 33"

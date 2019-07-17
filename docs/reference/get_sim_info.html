@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>disnet_comm1 — disnet_comm1 • disnet</title>
+<title>Get simulation information function — get_sim_info • disnet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="disnet_comm1 — disnet_comm1" />
+<meta property="og:title" content="Get simulation information function — get_sim_info" />
 
-<meta property="og:description" content="gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11" />
+<meta property="og:description" content="Reads in the simulation information files" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,39 +99,25 @@ Considers a commuting proportion of 11" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>disnet_comm1</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/01_commuting.R'><code>R/01_commuting.R</code></a></small>
-    <div class="hidden name"><code>disnet_comm1.Rd</code></div>
+    <h1>Get simulation information function</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nistara/disnet/blob/master/R/05_read-sims.R'><code>R/05_read-sims.R</code></a></small>
+    <div class="hidden name"><code>get_sim_info.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>gets commuting rate for each individual node (hence it's for individual nodes)
-Considers a commuting proportion of 11<!-- % for the entire population --></p>
+    <p>Reads in the simulation information files</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>disnet_comm1</span>(<span class='no'>j</span>, <span class='no'>edges_subset</span>, <span class='no'>i</span>, <span class='no'>N_c</span>)</pre>
+    <pre class="usage"><span class='fu'>get_sim_info</span>(<span class='no'>sim_dir</span>, <span class='kw'>nsims</span> <span class='kw'>=</span> <span class='fl'>NA</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>j</th>
-      <td><p>all the nodes `i` is connected to</p></td>
-    </tr>
-    <tr>
-      <th>edges_subset</th>
-      <td><p>subset of `nd_edges` with all outgoing edges of `i`</p></td>
-    </tr>
-    <tr>
-      <th>i</th>
-      <td><p>the node for which commuting proportion is being calculated</p></td>
-    </tr>
-    <tr>
-      <th>N_c</th>
-      <td><p>The commuting proportion of the entire population. Default = 0.11 from
-Simini</p></td>
+      <th>sim_dir</th>
+      <td><p>The directory containing simulation results.</p></td>
     </tr>
     </table>
     
