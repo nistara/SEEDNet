@@ -35,7 +35,7 @@
 #' @export
 #'
 #' @examples
-#' f = system.file("sampleData", "g.rds", package = "disnet")
+#' f = system.file("sampleData", "g.rds", package = "SEEDNet")
 #' g = readRDS(f)
 #' g_comm = disnet_commuting(g)
 #' nodes = igraph::vcount(g_comm)

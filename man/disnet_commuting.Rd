@@ -19,7 +19,7 @@ It incoporates both the individual and all nodes' functions.
 Note: it removes nodes with less than 10 people in them.
 }
 \examples{
-f = system.file("sampleData", "g.rds", package = "disnet")
+f = system.file("sampleData", "g.rds", package = "SEEDNet")
 g = readRDS(f)
 disnet_commuting(g)
 }

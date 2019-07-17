@@ -9,7 +9,7 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' f = system.file("sampleData", "g.rds", package = "disnet")
+#' f = system.file("sampleData", "g.rds", package = "SEEDNet")
 #' g = readRDS(f)
 #' map = map_g(g)
 
