@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set up graph file to run simulations upon — disnet_sim_setup • disnet</title>
+<title>Set up graph file to run simulations upon — disnet_sim_setup • SEEDNet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -62,7 +62,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">disnet</a>
+        <a class="navbar-link" href="../index.html">SEEDNet</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -194,93 +194,8 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleData"</span>, <span class='st'>"g.rds"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"disnet"</span>)
-<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)
-<span class='no'>g_comm</span> <span class='kw'>=</span> <span class='fu'>disnet_commuting</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; [1] "working on node: 7"
-#&gt; [1] "working on node: 10"
-#&gt; [1] "working on node: 20"
-#&gt; [1] "working on node: 33"
-#&gt; [1] "working on node: 38"
-#&gt; [1] "working on node: 58"
-#&gt; [1] "working on node: 81"
-#&gt; [1] "working on node: 97"
-#&gt; [1] "working on node: 110"
-#&gt; [1] "working on node: 112"
-#&gt; [1] "working on node: 134"
-#&gt; [1] "working on node: 136"
-#&gt; [1] "working on node: 138"
-#&gt; [1] "working on node: 140"
-#&gt; [1] "working on node: 150"
-#&gt; [1] "working on node: 152"
-#&gt; [1] "working on node: 163"
-#&gt; [1] "working on node: 182"
-#&gt; [1] "working on node: 185"
-#&gt; [1] "working on node: 197"
-#&gt; [1] "working on node: 231"
-#&gt; [1] "working on node: 241"
-#&gt; [1] "working on node: 245"
-#&gt; [1] "working on node: 257"
-#&gt; [1] "working on node: 261"
-#&gt; [1] "working on node: 265"
-#&gt; [1] "working on node: 273"
-#&gt; [1] "working on node: 274"
-#&gt; [1] "working on node: 318"
-#&gt; [1] "working on node: 321"
-#&gt; [1] "working on node: 337"
-#&gt; [1] "working on node: 363"
-#&gt; [1] "working on node: 382"
-#&gt; [1] "working on node: 412"
-#&gt; [1] "working on node: 415"
-#&gt; [1] "working on node: 416"
-#&gt; [1] "working on node: 427"
-#&gt; [1] "working on node: 446"
-#&gt; [1] "working on node: 477"
-#&gt; [1] "working on node: 501"
-#&gt; [1] "working on node: 539"
-#&gt; [1] "working on node: 554"
-#&gt; [1] "working on node: 570"
-#&gt; [1] "working on node: 615"
-#&gt; [1] "working on node: 626"
-#&gt; [1] "working on node: 627"
-#&gt; [1] "working on node: 642"
-#&gt; [1] "working on node: 643"
-#&gt; [1] "working on node: 653"
-#&gt; [1] "working on node: 666"
-#&gt; [1] "working on node: 667"
-#&gt; [1] "working on node: 704"
-#&gt; [1] "working on node: 738"
-#&gt; [1] "working on node: 739"
-#&gt; [1] "working on node: 742"
-#&gt; [1] "working on node: 746"
-#&gt; [1] "working on node: 754"
-#&gt; [1] "working on node: 760"
-#&gt; [1] "working on node: 761"
-#&gt; [1] "working on node: 765"
-#&gt; [1] "working on node: 771"
-#&gt; [1] "working on node: 773"
-#&gt; [1] "working on node: 774"
-#&gt; [1] "working on node: 787"
-#&gt; [1] "working on node: 792"
-#&gt; [1] "working on node: 819"
-#&gt; [1] "working on node: 820"
-#&gt; [1] "working on node: 824"
-#&gt; [1] "working on node: 842"
-#&gt; [1] "working on node: 846"
-#&gt; [1] "working on node: 858"
-#&gt; [1] "working on node: 865"
-#&gt; [1] "working on node: 867"
-#&gt; [1] "working on node: 872"
-#&gt; [1] "working on node: 877"
-#&gt; [1] "working on node: 884"
-#&gt; [1] "working on node: 906"
-#&gt; [1] "working on node: 908"
-#&gt; [1] "working on node: 911"
-#&gt; [1] "working on node: 930"
-#&gt; [1] "working on node: 944"
-#&gt; [1] "working on node: 977"
-#&gt; [1] "working on node: 978"</div><div class='input'><span class='no'>nodes</span> <span class='kw'>=</span> <span class='kw pkg'>igraph</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/igraph/topics/gorder'>vcount</a></span>(<span class='no'>g_comm</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>890</span>)
-<span class='no'>seed_nd</span> <span class='kw'>=</span> <span class='kw pkg'>igraph</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/igraph/topics/vertex_attr'>vertex_attr</a></span>(<span class='no'>g_comm</span>, <span class='st'>"name"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sample'>sample</a></span>(<span class='fl'>1</span>:<span class='no'>nodes</span>, <span class='fl'>1</span>))
-<span class='no'>for_sim</span> <span class='kw'>=</span> <span class='fu'>disnet_sim_setup</span>(<span class='no'>g_comm</span>, <span class='kw'>seed_nd</span> <span class='kw'>=</span> <span class='no'>seed_nd</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='fl'>NA</span>)</div></pre>
+<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: cannot open compressed file '', probable reason 'No such file or directory'</span></div><div class='output co'>#&gt; <span class='error'>Error in gzfile(file, "rb"): cannot open the connection</span></div><div class='input'><span class='no'>g_comm</span> <span class='kw'>=</span> <span class='fu'>disnet_commuting</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; <span class='error'>Error in "igraph" %in% class(graph): object 'g' not found</span></div><div class='input'><span class='no'>nodes</span> <span class='kw'>=</span> <span class='kw pkg'>igraph</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/igraph/topics/gorder'>vcount</a></span>(<span class='no'>g_comm</span>)</div><div class='output co'>#&gt; <span class='error'>Error in "igraph" %in% class(graph): object 'g_comm' not found</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>890</span>)
+<span class='no'>seed_nd</span> <span class='kw'>=</span> <span class='kw pkg'>igraph</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/igraph/topics/vertex_attr'>vertex_attr</a></span>(<span class='no'>g_comm</span>, <span class='st'>"name"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sample'>sample</a></span>(<span class='fl'>1</span>:<span class='no'>nodes</span>, <span class='fl'>1</span>))</div><div class='output co'>#&gt; <span class='error'>Error in "igraph" %in% class(graph): object 'g_comm' not found</span></div><div class='input'><span class='no'>for_sim</span> <span class='kw'>=</span> <span class='fu'>disnet_sim_setup</span>(<span class='no'>g_comm</span>, <span class='kw'>seed_nd</span> <span class='kw'>=</span> <span class='no'>seed_nd</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='fl'>NA</span>)</div><div class='output co'>#&gt; <span class='error'>Error in disnet_sim_setup(g_comm, seed_nd = seed_nd, output_dir = NA): object 'seed_nd' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

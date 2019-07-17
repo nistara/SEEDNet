@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Commuting function — disnet_commuting • disnet</title>
+<title>Commuting function — disnet_commuting • SEEDNet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -65,7 +65,7 @@ Note: it removes nodes with less than 10 people in them." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">disnet</a>
+        <a class="navbar-link" href="../index.html">SEEDNet</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -135,101 +135,7 @@ Simini</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleData"</span>, <span class='st'>"g.rds"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"disnet"</span>)
-<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)
-<span class='fu'>disnet_commuting</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; [1] "working on node: 7"
-#&gt; [1] "working on node: 10"
-#&gt; [1] "working on node: 20"
-#&gt; [1] "working on node: 33"
-#&gt; [1] "working on node: 38"
-#&gt; [1] "working on node: 58"
-#&gt; [1] "working on node: 81"
-#&gt; [1] "working on node: 97"
-#&gt; [1] "working on node: 110"
-#&gt; [1] "working on node: 112"
-#&gt; [1] "working on node: 134"
-#&gt; [1] "working on node: 136"
-#&gt; [1] "working on node: 138"
-#&gt; [1] "working on node: 140"
-#&gt; [1] "working on node: 150"
-#&gt; [1] "working on node: 152"
-#&gt; [1] "working on node: 163"
-#&gt; [1] "working on node: 182"
-#&gt; [1] "working on node: 185"
-#&gt; [1] "working on node: 197"
-#&gt; [1] "working on node: 231"
-#&gt; [1] "working on node: 241"
-#&gt; [1] "working on node: 245"
-#&gt; [1] "working on node: 257"
-#&gt; [1] "working on node: 261"
-#&gt; [1] "working on node: 265"
-#&gt; [1] "working on node: 273"
-#&gt; [1] "working on node: 274"
-#&gt; [1] "working on node: 318"
-#&gt; [1] "working on node: 321"
-#&gt; [1] "working on node: 337"
-#&gt; [1] "working on node: 363"
-#&gt; [1] "working on node: 382"
-#&gt; [1] "working on node: 412"
-#&gt; [1] "working on node: 415"
-#&gt; [1] "working on node: 416"
-#&gt; [1] "working on node: 427"
-#&gt; [1] "working on node: 446"
-#&gt; [1] "working on node: 477"
-#&gt; [1] "working on node: 501"
-#&gt; [1] "working on node: 539"
-#&gt; [1] "working on node: 554"
-#&gt; [1] "working on node: 570"
-#&gt; [1] "working on node: 615"
-#&gt; [1] "working on node: 626"
-#&gt; [1] "working on node: 627"
-#&gt; [1] "working on node: 642"
-#&gt; [1] "working on node: 643"
-#&gt; [1] "working on node: 653"
-#&gt; [1] "working on node: 666"
-#&gt; [1] "working on node: 667"
-#&gt; [1] "working on node: 704"
-#&gt; [1] "working on node: 738"
-#&gt; [1] "working on node: 739"
-#&gt; [1] "working on node: 742"
-#&gt; [1] "working on node: 746"
-#&gt; [1] "working on node: 754"
-#&gt; [1] "working on node: 760"
-#&gt; [1] "working on node: 761"
-#&gt; [1] "working on node: 765"
-#&gt; [1] "working on node: 771"
-#&gt; [1] "working on node: 773"
-#&gt; [1] "working on node: 774"
-#&gt; [1] "working on node: 787"
-#&gt; [1] "working on node: 792"
-#&gt; [1] "working on node: 819"
-#&gt; [1] "working on node: 820"
-#&gt; [1] "working on node: 824"
-#&gt; [1] "working on node: 842"
-#&gt; [1] "working on node: 846"
-#&gt; [1] "working on node: 858"
-#&gt; [1] "working on node: 865"
-#&gt; [1] "working on node: 867"
-#&gt; [1] "working on node: 872"
-#&gt; [1] "working on node: 877"
-#&gt; [1] "working on node: 884"
-#&gt; [1] "working on node: 906"
-#&gt; [1] "working on node: 908"
-#&gt; [1] "working on node: 911"
-#&gt; [1] "working on node: 930"
-#&gt; [1] "working on node: 944"
-#&gt; [1] "working on node: 977"
-#&gt; [1] "working on node: 978"</div><div class='output co'>#&gt; IGRAPH c65a94e DN-- 83 6806 -- 
-#&gt; + attr: name (v/c), pop (v/n), lat (v/n), lon (v/n), id (v/c), sigma
-#&gt; | (v/n), Total_Length (e/n), pop_from (e/n), pop_to (e/n),
-#&gt; | commuting_prop (e/n)
-#&gt; + edges from c65a94e (vertex names):
-#&gt;  [1] 7-&gt;10  7-&gt;20  7-&gt;33  7-&gt;38  7-&gt;58  7-&gt;81  7-&gt;97  7-&gt;110 7-&gt;112 7-&gt;134
-#&gt; [11] 7-&gt;136 7-&gt;138 7-&gt;140 7-&gt;150 7-&gt;152 7-&gt;163 7-&gt;182 7-&gt;185 7-&gt;197 7-&gt;231
-#&gt; [21] 7-&gt;241 7-&gt;245 7-&gt;257 7-&gt;261 7-&gt;265 7-&gt;273 7-&gt;274 7-&gt;318 7-&gt;321 7-&gt;337
-#&gt; [31] 7-&gt;363 7-&gt;382 7-&gt;412 7-&gt;415 7-&gt;416 7-&gt;427 7-&gt;446 7-&gt;477 7-&gt;501 7-&gt;539
-#&gt; [41] 7-&gt;554 7-&gt;570 7-&gt;615 7-&gt;626 7-&gt;627 7-&gt;642 7-&gt;643 7-&gt;653 7-&gt;666 7-&gt;667
-#&gt; [51] 7-&gt;704 7-&gt;738 7-&gt;739 7-&gt;742 7-&gt;746 7-&gt;754 7-&gt;760 7-&gt;761 7-&gt;765 7-&gt;771
-#&gt; + ... omitted several edges</div></pre>
+<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: cannot open compressed file '', probable reason 'No such file or directory'</span></div><div class='output co'>#&gt; <span class='error'>Error in gzfile(file, "rb"): cannot open the connection</span></div><div class='input'><span class='fu'>disnet_commuting</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; <span class='error'>Error in "igraph" %in% class(graph): object 'g' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

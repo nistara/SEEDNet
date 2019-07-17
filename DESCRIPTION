@@ -1,4 +1,4 @@
-Package: disnet
+Package: SEEDNet
 Title: Simulate disease spread across a geospatial network
 Version: 0.0.0.9000
 Authors@R: c(

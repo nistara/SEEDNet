@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to map the network — map_g • disnet</title>
+<title>Function to map the network — map_g • SEEDNet</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -63,7 +63,7 @@ of interest specified by the user." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">disnet</a>
+        <a class="navbar-link" href="../index.html">SEEDNet</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
       </span>
     </div>
@@ -130,8 +130,7 @@ of interest specified by the user.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>f</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"sampleData"</span>, <span class='st'>"g.rds"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"disnet"</span>)
-<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)
-<span class='no'>map</span> <span class='kw'>=</span> <span class='fu'>map_g</span>(<span class='no'>g</span>)</div></pre>
+<span class='no'>g</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/readRDS'>readRDS</a></span>(<span class='no'>f</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: cannot open compressed file '', probable reason 'No such file or directory'</span></div><div class='output co'>#&gt; <span class='error'>Error in gzfile(file, "rb"): cannot open the connection</span></div><div class='input'><span class='no'>map</span> <span class='kw'>=</span> <span class='fu'>map_g</span>(<span class='no'>g</span>)</div><div class='output co'>#&gt; <span class='error'>Error in "igraph" %in% class(graph): object 'g' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
