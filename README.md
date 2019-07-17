@@ -2,10 +2,10 @@
 
 [![Build Status](https://travis-ci.com/nistara/disnet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/nistara/disnet)
 
-# Satellite Enhanced Epidemic Disease Network (SEEDNet)
+# SEEDNet: Satellite Enhanced Epidemic Disease Network
 
-`SEEDNet` has been designed to simulate influenza (for now) over a network created
-by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.  
+`SEEDNet` has been designed to simulate outbreaks over a network created
+by combining satellite imagery, population data, and road network information.
 
 ## Example datasets
 While a smaller example dataset is included in `inst/sampleData`, the bigger examples can be found in this [Google Drive link](https://drive.google.com/open?id=1Mr6PKOlWHHRE_rl9d4-ZgtIO822DpwdM). They include:
@@ -66,5 +66,4 @@ f = system.file("sampleData", "g.rds", package = "disnet")
 g = readRDS(f)
 ```
 
-**Note**: The steps to convert the ArcGIS output to raw `g` network have not yet been included.
 

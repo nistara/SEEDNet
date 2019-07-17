@@ -66,10 +66,10 @@
   <div class="contents col-md-9">
 
 
-<div id="satellite-enhanced-epidemic-disease-network-seednet" class="section level1">
+<div id="seednet-satellite-enhanced-epidemic-disease-network" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#satellite-enhanced-epidemic-disease-network-seednet" class="anchor"></a>Satellite Enhanced Epidemic Disease Network (SEEDNet)</h1></div>
-<p><code>SEEDNet</code> has been designed to simulate influenza (for now) over a network created by combining satellite imagery, population data, and road network information. The intent is to generalize it for other diseases, focusing on Ebola for now.</p>
+<a href="#seednet-satellite-enhanced-epidemic-disease-network" class="anchor"></a>SEEDNet: Satellite Enhanced Epidemic Disease Network</h1></div>
+<p><code>SEEDNet</code> has been designed to simulate outbreaks over a network created by combining satellite imagery, population data, and road network information.</p>
 <div id="example-datasets" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-datasets" class="anchor"></a>Example datasets</h2>
@@ -133,7 +133,6 @@ simres2 =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span 
 <p>To access the sample dataset:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"sampleData"</span>, <span class="st">"g.rds"</span>, <span class="dt">package =</span> <span class="st">"disnet"</span>)
 g =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(f)</code></pre></div>
-<p><strong>Note</strong>: The steps to convert the ArcGIS output to raw <code>g</code> network have not yet been included.</p>
 </div>
 </div>
 
