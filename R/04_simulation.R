@@ -32,7 +32,7 @@ disnet_simulate = function(nsims = 10,
 {
     # create directory to store results in
     if(!is.na(sim_output_dir) && !dir.exists(sim_output_dir)) {
-        dir.create(sim_output_dir)
+        dir.create(sim_output_dir, recursive = TRUE)
     }
     # start simulation message
     message("\nStarting simulations\n")

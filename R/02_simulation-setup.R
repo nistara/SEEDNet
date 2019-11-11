@@ -165,7 +165,7 @@ disnet_sim_setup = function(g,
     
     if(length(output_dir) > 0 && !is.na(output_dir)) {
 
-        if(!dir.exists(output_dir)) dir.create(output_dir)
+        if(!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
         if(vacc) {
             vacc_prop = gsub("\\.", "p", names(sim_input))
