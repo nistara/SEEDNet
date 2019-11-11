@@ -28,7 +28,7 @@
 #' disnet_commuting(g)
 #' @export
 
-disnet_commuting = function(g, N_c = 0.11)
+disnet_commuting = function(g, N_c = 0.11, round_sigma = FALSE, ...)
 {
     comm_info = disnet_comm3(g)
     g_edges = comm_info$g_edges
@@ -42,8 +42,10 @@ disnet_commuting = function(g, N_c = 0.11)
     verts_info$sigma = aggregate(commuting_prop ~ as.numeric(g_edges$from),
                                  data = g_edges, FUN = sum)[["V1"]]
 
-    # rounding commuting proportion to 2 decimal places
-    # verts_info$sigma = round(verts_info$sigma, 2)
+    if( round_sigma ) {
+        # rounding commuting proportion to 2 decimal places
+        verts_info$sigma = round(verts_info$sigma, 2)
+    }
 
     ## Create graph file
     g_comm = igraph::graph_from_data_frame(g_edges,
