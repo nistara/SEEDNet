@@ -4,7 +4,7 @@
 \alias{disnet_commuting}
 \title{Commuting function}
 \usage{
-disnet_commuting(g, N_c = 0.11)
+disnet_commuting(g, N_c = 0.11, round_sigma = FALSE, ...)
 }
 \arguments{
 \item{g}{The `graphml` (network) object for which to calculate commuting rates}
