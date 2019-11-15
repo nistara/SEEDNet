@@ -45,8 +45,9 @@ get_inf_info = function(sims, sim_info, sim_l) {
 get_sim_summ = function(inf_info) {
     sim_summ_l = sapply(split(inf_info, inf_info$type), nrow)
 
-    sim_summ_info = round(inf_info %>% group_by(type) %>%
-                          summarise_all(funs(mean, min, max)), 1)
+    sim_summ_info = round(inf_info %>%
+                          group_by(type) %>%
+                          summarise_all(list(mean = mean, min = min, max = max)), 1)
 
     sim_summ_info$n = sim_summ_l
 
