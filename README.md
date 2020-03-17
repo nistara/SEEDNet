@@ -1,6 +1,6 @@
 
 
-[![Build Status](https://travis-ci.com/nistara/disnet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/nistara/disnet)
+[![Build Status](https://travis-ci.com/nistara/SEEDNet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/github/nistara/SEEDNet)
 
 # SEEDNet: Satellite Enhanced Epidemic Disease Network
 
