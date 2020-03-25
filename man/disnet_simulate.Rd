@@ -25,7 +25,7 @@ This function wraps up all simulation sub-functins and applies them to
 the intermediate sim files (created by `disnet_sim_setup`
 }
 \examples{
-f = system.file("sampleData", "g.rds", package = "SEEDNet")
+f = system.file("sample_data", "g.rds", package = "SEEDNet")
 g = readRDS(f)
 g_comm = disnet_commuting(g)
 nodes = igraph::vcount(g_comm)

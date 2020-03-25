@@ -16,7 +16,7 @@ This function creates a leaflet map of the network, and highlights nodes
 of interest specified by the user.
 }
 \examples{
-f = system.file("sampleData", "g.rds", package = "SEEDNet")
+f = system.file("sample_data", "g.rds", package = "SEEDNet")
 g = readRDS(f)
 map = map_g(g)
 }

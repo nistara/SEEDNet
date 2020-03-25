@@ -12,7 +12,7 @@
 #' @param sim_output_dir The directory you'd like to save the simulation results to.
 #'
 #' @examples
-#' f = system.file("sampleData", "g.rds", package = "SEEDNet")
+#' f = system.file("sample_data", "g.rds", package = "SEEDNet")
 #' g = readRDS(f)
 #' g_comm = disnet_commuting(g)
 #' nodes = igraph::vcount(g_comm)
