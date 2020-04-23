@@ -365,6 +365,7 @@ get_all_times_sim = function(all_times) {
                        start_uppCI = unname(start_CI["upper"]),
                        start_sd = sd(df$inf_start),
                        start_median = median(df$inf_start),
+                       start_IQR = IQR(df$inf_start),
                        start_mode = Mode(df$inf_start),
                        len_mean = mean(df$inf_len),
                        len_sd = sd(df$inf_len),
