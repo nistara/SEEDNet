@@ -47,14 +47,27 @@ get_sim_summ = function(inf_info) {
 
     sim_summ_info = round(inf_info %>%
                           group_by(type) %>%
-                          summarise_all(list(mean = mean, min = min, max = max)), 1)
+                          summarise_all(list(mean = mean,
+                                             sd = sd,
+                                             min = min,
+                                             max = max)), 1)
 
     sim_summ_info$n = sim_summ_l
 
     as.data.frame(
-        sim_summ_info[ , c("n", "type", "nds_min", "nds_mean", "nds_max",
-                       "days_min", "days_mean", "days_max",
-                       "inf_min", "inf_mean", "inf_max")])
+        sim_summ_info[ , c("n", "type",
+                           "nds_min",
+                           "nds_mean",
+                           "nds_sd",
+                           "nds_max",
+                           "days_min",
+                           "days_mean",
+                           "days_sd",
+                           "days_max",
+                           "inf_min",
+                           "inf_mean",
+                           "inf_sd",
+                           "inf_max")])
 }
 
 
