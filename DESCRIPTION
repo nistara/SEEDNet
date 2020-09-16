@@ -3,7 +3,8 @@ Title: Simulate disease spread across a geospatial network
 Version: 0.0.0.9000
 Authors@R: c(
 	   person("Nistara", "Randhawa", email = "nrandhawa@ucdavis.edu", role = c("aut", "cre")),
-	   person("Duncan Temple", "Lang", role = "aut"))
+	   person("Duncan Temple", "Lang", role = "aut"),
+	   person("Jonna", "Mazet", role = "sad"))
 Description: This package simulates a dicrete time, stochastic, metapopulation disease model over a geospatial network. It integrates local commuting rate (via the radiation model) as a proxy for human movement across the network. 
 Depends: R (>= 3.3.3)
 License: GPL-3
