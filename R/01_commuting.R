@@ -1,13 +1,4 @@
 # ==============================================================================
-# This code calculates the commuting rates between nodes in the graph
-#
-# There are 1606 nodes, and 2577630 edges (after removing the self edges:
-#      (1606 * 1606) - 1606 = 2577630
-#      NOTE: they go from 0-1605, not 1-1606
-#            the matrix is arranged from smallest distance to largest one
-# ==============================================================================
-
-
 # Functions for commuting rate (removing nodes with < 10 people)
 # ==============================================================================
 
@@ -23,7 +14,7 @@
 #' Simini
 #'
 #' @examples
-#' f = system.file("sample_data", "g.rds", package = "SEEDNet")
+#' f = system.file("sample_data", "network/g10.rds", package = "SEEDNet")
 #' g = readRDS(f)
 #' disnet_commuting(g)
 #' @export
