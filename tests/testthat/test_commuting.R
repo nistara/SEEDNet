@@ -8,7 +8,7 @@ quiet = function(x) {
 context("test commuting with network sample")
 test_that("", {
     # g_file = "inst/sample_data/network/g_5.RDS"
-    g_file = system.file("sample_data", "network", "g_5.RDS", package="SEEDNet")
+    g_file = system.file("sample_data", "network", "g5.RDS", package="SEEDNet")
     g = readRDS(g_file)
     comm_rate = 0.11
     g_edges = igraph::as_data_frame(g, "edges")
@@ -28,7 +28,7 @@ test_that("", {
 context("test commuting with generated sample")
 test_that("", {
     
-    g_file = system.file("sample_data", "network", "g_5.RDS", package="SEEDNet")
+    g_file = system.file("sample_data", "network", "g5.RDS", package="SEEDNet")
     g = readRDS(g_file)
     pop10 = igraph::V(g)[ igraph::V(g)$pop >= 10 ]
     g = igraph::induced.subgraph(g, pop10)
