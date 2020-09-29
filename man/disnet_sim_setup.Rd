@@ -60,7 +60,7 @@ Set up graph file to run simulations upon
      (FOI = Force of Infection, acting on an individual in a node)
 }
 \examples{
-f = system.file("sample_data", "network/g10.rds", package = "SEEDNet")
+f = system.file("sample_data/network", "g10.rds", package = "SEEDNet")
 g = readRDS(f)
 g_comm = disnet_commuting(g)
 nodes = igraph::vcount(g_comm)
