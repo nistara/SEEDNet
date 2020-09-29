@@ -4,7 +4,7 @@
 #
 # ==============================================================================
 
-g_comm_f = list.files("inst/sample_data/commuting/")
+g_comm_f = list.files("inst/sample_data/commuting", full.names = TRUE)
 
 comm_chk = function(n, dfe) {
     from = dfe$name[ n ]
@@ -27,7 +27,8 @@ comm_chk = function(n, dfe) {
 
 
 all_comm_chk = lapply(g_comm_f, function(g_comm) {
-    g_comm = readRDS("inst/sample_data/commuting/g5_comm.RDS")
+    cat(paste0("\n", g_comm, "\n"))
+    g_comm = readRDS(g_comm)
     dfe = igraph::as_data_frame(g_comm, "edges")
     sapply(seq_len(nrow(dfe)), comm_chk, dfe)
 })
