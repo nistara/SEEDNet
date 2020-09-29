@@ -14,7 +14,7 @@
 #' Simini
 #'
 #' @examples
-#' f = system.file("sample_data/network", "g10.rds", package = "SEEDNet")
+#' f = system.file("sample_data/network", "g10.RDS", package = "SEEDNet")
 #' g = readRDS(f)
 #' disnet_commuting(g)
 #' @export
