@@ -1,7 +1,8 @@
 # ==============================================================================
 #
 # This code calculates the commuting rates between nodes in the graph
-#
+# NOTE: it deletes those nodes that have <10 people in them
+# 
 # ==============================================================================
 
 g_sizes = c(5, 10, 100)

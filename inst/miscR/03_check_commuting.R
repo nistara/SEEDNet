@@ -4,11 +4,11 @@
 #
 # ==============================================================================
 
-g_comm_f = list.files("inst/sample_data/commuting", full.names = TRUE)
+g_comm_files = list.files("inst/sample_data/commuting", full.names = TRUE)
 
 comm_chk = function(n, dfe) {
     from = dfe$name[ n ]
-    to = dfv$name[ n ]
+    to = dfe$name[ n ]
 
     radius = dfe$Total_Length[ dfe$from %in% from &
                                dfe$to %in% to ]
@@ -17,7 +17,7 @@ comm_chk = function(n, dfe) {
     m_i = df_radius$pop_from[1]
     n_j = df_radius$pop_to[ df_radius$to %in% to]
     s_ij = sum(df_radius$pop_to[ df_radius$to != to])
-    N = 1 # to get 0.11 as proportion
+    N = 1 
     N_c = 0.11
     T_i = (N_c/N) # want only rate, not num people. original:  m_i * (N_c/N)
     T_ij = T_i * ( (m_i * n_j) / ((m_i + s_ij) * (m_i + n_j + s_ij)) )
@@ -26,7 +26,7 @@ comm_chk = function(n, dfe) {
 }
 
 
-all_comm_chk = lapply(g_comm_f, function(g_comm) {
+all_comm_chk = lapply(g_comm_files, function(g_comm) {
     cat(paste0("\n", g_comm, "\n"))
     g_comm = readRDS(g_comm)
     dfe = igraph::as_data_frame(g_comm, "edges")
