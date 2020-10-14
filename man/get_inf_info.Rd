@@ -4,7 +4,7 @@
 \alias{get_inf_info}
 \title{Compare outbreak information across simulations}
 \usage{
-get_inf_info(sims, sim_info, sim_l)
+get_inf_info(sims, sim_info, sim_l, threshold_nds = 100)
 }
 \arguments{
 \item{sims}{Individual simulation results}
