@@ -7,7 +7,7 @@
 #'
 #' @export
 #' 
-get_inf_info = function(sims, sim_info, sim_l) {
+get_inf_info = function(sims, sim_info, sim_l, threshold_nds = 100) {
     nds = sapply(sims, function(l) {
         nds = lapply(l, function(df) {
             df = unique(df[ df$I > 0 | df$Ia > 0, "name"])        
@@ -28,8 +28,8 @@ get_inf_info = function(sims, sim_info, sim_l) {
                     days = sim_l,
                     stringsAsFactors = FALSE)
     df$type = ifelse(df$nds == 1, 1,
-              ifelse(df$nds > 1 &df$nds < 100, 2,
-              ifelse(df$nds > 100, 3, NA)))
+              ifelse(df$nds > 1 &df$nds <= threshold_nds, 2,
+              ifelse(df$nds > threshold_nds, 3, NA)))
     df
 }
 
@@ -46,8 +46,8 @@ get_sim_summ = function(inf_info) {
     sim_summ_l = sapply(split(inf_info, inf_info$type), nrow)
 
     sim_summ_info = round(inf_info %>%
-                          group_by(type) %>%
-                          summarise_all(list(mean = mean,
+                          dplyr::group_by(type) %>%
+                          dplyr::summarise_all(list(mean = mean,
                                              sd = sd,
                                              min = min,
                                              max = max)), 1)
