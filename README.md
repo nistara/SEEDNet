@@ -67,3 +67,4 @@ g = readRDS(f)
 ```
 
 
+![](https://github.com/nistara/SEEDNet/blob/master/inst/sim_anim.gif?raw=true)
