@@ -10,7 +10,7 @@ seed_row = 890
 
 # ** Set number of simulations and timesteps
 nsims = 50
-nsteps = 100
+nsteps = 500
 
 
 # ** set up future_lapply for parallelizing simulation runs
