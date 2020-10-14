@@ -76,10 +76,10 @@
 <p>While a smaller example dataset is included in <code>inst/sampleData</code>, the bigger examples can be found in this <a href="https://drive.google.com/open?id=1Mr6PKOlWHHRE_rl9d4-ZgtIO822DpwdM">Google Drive link</a>. They include:</p>
 <ol>
 <li>
-<code>g_raw.RDA</code>: For using with <code>disnet_commuting()</code>
+<code>g_raw.RDA</code>: For using with <code><a href="reference/disnet_commuting.html">disnet_commuting()</a></code>
 </li>
 <li>
-<code>g.RDA</code>: For using with <code>disnet_sim_setup()</code>
+<code>g.RDA</code>: For using with <code><a href="reference/disnet_sim_setup.html">disnet_sim_setup()</a></code>
 </li>
 <li>
 <code>sim_intermed.RDA</code>: To run the <code>disnet_simulation()</code> function with.</li>
@@ -107,7 +107,7 @@ f =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation
 g =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(f)
 
 <span class="co"># calculate commuting rates over it</span>
-g_comm =<span class="st"> </span><span class="kw">disnet_commuting</span>(g)
+g_comm =<span class="st"> </span><span class="kw"><a href="reference/disnet_commuting.html">disnet_commuting</a></span>(g)
 
 <span class="co"># select random node to seed infection in</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">890</span>)
@@ -115,12 +115,12 @@ nodes =<span class="st"> </span>igraph<span class="op">::</span><span class="kw"
 seed_nd =<span class="st"> </span>igraph<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/igraph/topics/vertex_attr">vertex_attr</a></span>(g_comm, <span class="st">"name"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="dv">1</span><span class="op">:</span>nodes, <span class="dv">1</span>))
 
 <span class="co"># set up the network for simulations</span>
-for_sim =<span class="st"> </span><span class="kw">disnet_sim_setup</span>(g_comm, <span class="dt">seed_nd =</span> seed_nd, <span class="dt">output_dir =</span> <span class="ot">NA</span>)
+for_sim =<span class="st"> </span><span class="kw"><a href="reference/disnet_sim_setup.html">disnet_sim_setup</a></span>(g_comm, <span class="dt">seed_nd =</span> seed_nd, <span class="dt">output_dir =</span> <span class="ot">NA</span>)
 
 <span class="co"># run the simulations over the network</span>
-simres =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>)
+simres =<span class="st"> </span><span class="kw"><a href="reference/disnet_simulate.html">disnet_simulate</a></span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>)
 
-simres2 =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>,
+simres2 =<span class="st"> </span><span class="kw"><a href="reference/disnet_simulate.html">disnet_simulate</a></span>(<span class="dt">sim_input =</span> for_sim, <span class="dt">sim_output_dir =</span> <span class="ot">NA</span>,
 <span class="dt">parallel =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 <div id="sample-datasets" class="section level2">
@@ -133,6 +133,7 @@ simres2 =<span class="st"> </span><span class="kw">disnet_simulate</span>(<span 
 <p>To access the sample dataset:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="st">"sampleData"</span>, <span class="st">"g.rds"</span>, <span class="dt">package =</span> <span class="st">"disnet"</span>)
 g =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/readRDS">readRDS</a></span>(f)</code></pre></div>
+<p><img src="https://github.com/nistara/SEEDNet/blob/master/inst/sim_anim.gif?raw=true"></p>
 </div>
 </div>
 
@@ -157,13 +158,14 @@ g =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation
 <ul class="list-unstyled">
 <li>Nistara Randhawa <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Duncan Temple Lang <br><small class="roles"> Author </small>  </li>
+<li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
 
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.com/nistara/disnet"><img src="https://travis-ci.com/nistara/disnet.svg?token=NzZHVjGpzy5BDLtSKxLg&amp;branch=master" alt="Build Status"></a></li>
+<li><a href="https://travis-ci.com/github/nistara/SEEDNet"><img src="https://travis-ci.com/nistara/SEEDNet.svg?token=NzZHVjGpzy5BDLtSKxLg&amp;branch=master" alt="Build Status"></a></li>
 </ul>
 </div>
 </div>
