@@ -67,4 +67,4 @@ g = readRDS(f)
 ```
 
 
-![](https://github.com/nistara/SEEDNet/blob/master/inst/sim_anim.gif?raw=true)
+![](https://raw.githubusercontent.com/nistara/SEEDNet/master/inst/sim_anim.gif?token=AC4OAU77IVHOLJXC5Y37NLS7R7OVI)
