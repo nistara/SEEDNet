@@ -1,0 +1,49 @@
+---
+output: 
+  github_document:
+    toc: false
+    fig_width: 10.08
+    fig_height: 6
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  dpi = 300,
+  # tidy.opts = list(width.cutoff = 80),
+  # fig.path = "man/figures/",
+  comment = "#>"
+)
+# options(knitr.kable.NA = '',
+        # digits = 1,
+        # width = 80)
+
+```
+
+# SEEDNet
+
+[![Build Status](https://travis-ci.com/nistara/SEEDNet.svg?token=NzZHVjGpzy5BDLtSKxLg&branch=master)](https://travis-ci.com/github/nistara/SEEDNet)
+
+`SEEDNet` has been designed to simulate outbreaks over a network created
+by combining satellite imagery, population data, and road network information. It is versatile in that it can be used for any metapopulation model on networks with distance and population data.
+
+![](https://raw.githubusercontent.com/nistara/SEEDNet/master/inst/sim_anim.gif?token=AC4OAU77IVHOLJXC5Y37NLS7R7OVI)
+
+## Installation
+
+Run the following:
+
+```{r eval = FALSE, message = FALSE, warning = FALSE}
+remotes::install_github("nistara/SEEDNet")
+```
+```{r message = FALSE, warning = FALSE}
+library("SEEDNet")
+```
+
+## Documentation
+
+## Contributing and Support
+If you would like to contribute to this software, please submit a pull request to the [GitHub repository](https://github.com/nistara/SEEDNet). Feel free to report issues, provide feedback, suggest improvements, and ask questions by [opening a new issue](https://github.com/nistara/SEEDNet/issues).
+
